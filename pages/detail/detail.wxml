@@ -1,0 +1,158 @@
+<!--pages/detail/detail.wxml-->
+<view class="container">
+  <view class="header">
+    <image class="cover" src="{{detail.imageUrl}}" mode="aspectFill"></image>
+    <view class="info">
+      <text class="title">{{detail.title}}</text>
+      <view class="meta">
+        <text class="category">{{detail.category}}</text>
+        <text class="year">{{detail.year}}</text>
+        <text wx:if="{{detail.duration}}" class="duration">{{detail.duration}}</text>
+      </view>
+      <view class="rating-container">
+        <text class="rating">{{detail.rating}}</text>
+        <view class="stars">
+          <block wx:for="{{5}}" wx:key="*this">
+            <image class="star" src="{{index < Math.floor(detail.rating/2) ? '/images/star_filled.png' : '/images/star_empty.png'}}"></image>
+          </block>
+        </view>
+        <text class="rating-count">{{detail.ratingCount}}人评</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <view class="action-item" bindtap="toggleCollect">
+      <image src="{{isCollected ? '/images/collect_filled.png' : '/images/collect.png'}}"></image>
+      <text>收藏</text>
+    </view>
+    <view class="action-item" bindtap="toggleRating">
+      <image src="{{hasRated ? '/images/rating_filled.png' : '/images/rating.png'}}"></image>
+      <text>评分</text>
+    </view>
+    <view class="action-item" bindtap="navigateToComments">
+      <image src="/images/comment.png"></image>
+      <text>评论</text>
+    </view>
+    <view class="action-item" bindtap="share">
+      <image src="/images/share.png"></image>
+      <text>分享</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">简介</view>
+    <text class="description">{{detail.description}}</text>
+    <view class="expand" bindtap="toggleDescription" wx:if="{{detail.description.length > 100 && !showFullDesc}}">展开</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">基本信息</view>
+    <view class="info-item" wx:if="{{detail.director}}">
+      <text class="info-label">导演：</text>
+      <text class="info-value">{{detail.director}}</text>
+    </view>
+    <view class="info-item" wx:if="{{detail.actors}}">
+      <text class="info-label">演员：</text>
+      <text class="info-value">{{detail.actors}}</text>
+    </view>
+    <view class="info-item" wx:if="{{detail.type}}">
+      <text class="info-label">类型：</text>
+      <text class="info-value">{{detail.type}}</text>
+    </view>
+    <view class="info-item" wx:if="{{detail.language}}">
+      <text class="info-label">语言：</text>
+      <text class="info-value">{{detail.language}}</text>
+    </view>
+    <view class="info-item" wx:if="{{detail.venue}}">
+      <text class="info-label">场馆：</text>
+      <text class="info-value">{{detail.venue}}</text>
+    </view>
+    <view class="info-item" wx:if="{{detail.showDate}}">
+      <text class="info-label">演出时间：</text>
+      <text class="info-value">{{detail.showDate}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-header">
+      <text class="card-title">评论</text>
+      <text class="more" bindtap="navigateToComments">查看全部 ></text>
+    </view>
+    <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+      <image class="avatar" src="{{item.avatar}}"></image>
+      <view class="comment-content">
+        <view class="comment-header">
+          <text class="username">{{item.username}}</text>
+          <text class="comment-rating">{{item.rating}}分</text>
+        </view>
+        <text class="comment-text">{{item.content}}</text>
+        <text class="comment-time">{{item.time}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">AI情感分析</view>
+    <view class="sentiment">
+      <view class="sentiment-item">
+        <text class="sentiment-label">正面评价</text>
+        <progress percent="{{detail.sentimentAnalysis.positive}}" stroke-width="8" activeColor="#4caf50" backgroundColor="#e0e0e0"></progress>
+        <text class="sentiment-value">{{detail.sentimentAnalysis.positive}}%</text>
+      </view>
+      <view class="sentiment-item">
+        <text class="sentiment-label">中性评价</text>
+        <progress percent="{{detail.sentimentAnalysis.neutral}}" stroke-width="8" activeColor="#2196f3" backgroundColor="#e0e0e0"></progress>
+        <text class="sentiment-value">{{detail.sentimentAnalysis.neutral}}%</text>
+      </view>
+      <view class="sentiment-item">
+        <text class="sentiment-label">负面评价</text>
+        <progress percent="{{detail.sentimentAnalysis.negative}}" stroke-width="8" activeColor="#f44336" backgroundColor="#e0e0e0"></progress>
+        <text class="sentiment-value">{{detail.sentimentAnalysis.negative}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">热度趋势</view>
+    <canvas canvas-id="trendChart" class="trend-chart"></canvas>
+  </view>
+
+  <view class="card">
+    <view class="section-header">
+      <text class="card-title">相关推荐</text>
+    </view>
+    <scroll-view scroll-x class="scroll-view-x">
+      <view class="item-container">
+        <view class="item" wx:for="{{relatedItems}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
+          <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
+          <view class="item-info">
+            <text class="item-title">{{item.title}}</text>
+            <view class="item-rating">
+              <text class="rating-score">{{item.rating}}</text>
+              <text class="rating-count">{{item.ratingCount}}人评</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- Rating Dialog -->
+  <view class="rating-dialog" wx:if="{{showRatingDialog}}">
+    <view class="rating-dialog-content">
+      <view class="rating-dialog-header">
+        <text class="rating-dialog-title">为{{detail.title}}评分</text>
+        <image class="rating-dialog-close" src="/images/close.png" bindtap="closeRatingDialog"></image>
+      </view>
+      <view class="rating-stars">
+        <block wx:for="{{5}}" wx:key="*this">
+          <image class="rating-star" src="{{index < currentRating ? '/images/star_filled.png' : '/images/star_empty.png'}}" data-rating="{{index+1}}" bindtap="selectRating"></image>
+        </block>
+      </view>
+      <text class="rating-hint">{{ratingHints[currentRating-1] || '请选择评分'}}</text>
+      <textarea class="rating-comment" placeholder="分享你的观后感（选填）" bindinput="onCommentInput" value="{{userComment}}"></textarea>
+      <button class="rating-submit" bindtap="submitRating">提交评分</button>
+    </view>
+  </view>
+</view>
