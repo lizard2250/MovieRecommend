@@ -133,9 +133,9 @@ Page({
           tags: ['科幻', '动作', '悬疑', '剧情', '音乐剧']
         },
         recentItems: [
-          { id: '101', title: '流浪地球2', imageUrl: 'https://img.mockdata.com/movie1.jpg', rating: '9.1', ratingCount: '1.2万' },
-          { id: '302', title: '《猫》音乐剧', imageUrl: 'https://img.mockdata.com/show2.jpg', rating: '9.0', ratingCount: '1万' },
-          { id: '203', title: '超能一家人', imageUrl: 'https://img.mockdata.com/movie7.jpg', rating: '7.5', ratingCount: '4千' }
+          { id: '101', title: '流浪地球2', imageUrl: 'https://picsum.photos/300/450?random=101', rating: '9.1', ratingCount: '1.2万' },
+          { id: '302', title: '《猫》音乐剧', imageUrl: 'https://picsum.photos/300/450?random=302', rating: '9.0', ratingCount: '1万' },
+          { id: '203', title: '超能一家人', imageUrl: 'https://picsum.photos/300/450?random=203', rating: '7.5', ratingCount: '4千' }
         ]
       })
 
@@ -170,7 +170,7 @@ Page({
       // Mock user data
       const mockUserInfo = {
         nickName: '影评达人',
-        avatarUrl: 'https://img.mockdata.com/avatar_default.jpg',
+        avatarUrl: 'https://via.placeholder.com/100x100/607D8B/FFFFFF?text=用户',
       }
       
       wx.setStorageSync('userInfo', mockUserInfo)

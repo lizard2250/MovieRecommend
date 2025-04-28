@@ -225,7 +225,7 @@ Page({
           id: '101',
           title: '流浪地球2',
           category: '电影',
-          imageUrl: 'https://img.mockdata.com/movie1.jpg',
+          imageUrl: 'https://picsum.photos/300/450?random=101',
           year: '2023',
           director: '郭帆',
           rating: '9.1',
@@ -237,7 +237,7 @@ Page({
           id: '102',
           title: '满江红',
           category: '电影',
-          imageUrl: 'https://img.mockdata.com/movie2.jpg',
+          imageUrl: 'https://picsum.photos/300/450?random=102',
           year: '2023',
           director: '张艺谋',
           rating: '8.7',
@@ -249,25 +249,36 @@ Page({
           id: '103',
           title: '独行月球',
           category: '电影',
-          imageUrl: 'https://img.mockdata.com/movie3.jpg',
+          imageUrl: 'https://picsum.photos/300/450?random=103',
           year: '2022',
           director: '张吃鱼',
           rating: '8.5',
           ratingCount: '1.5万',
-          description: '讲述了航天员独自在月球生存并寻找返回地球方法的故事。',
+          description: '讲述了在月球探索过程中，发生的一系列惊险故事。',
           genres: ['科幻', '喜剧']
         },
         {
           id: '104',
           title: '长空之王',
           category: '电影',
-          imageUrl: 'https://img.mockdata.com/movie4.jpg',
+          imageUrl: 'https://picsum.photos/300/450?random=104',
           year: '2023',
-          director: '刘晓世',
+          director: '刘晓光',
           rating: '8.3',
           ratingCount: '6千',
-          description: '讲述了一名飞行员不断挑战自我，最终成长为优秀飞行员的故事。',
+          description: '讲述了空军王牌飞行员的故事。',
           genres: ['动作', '剧情']
+        },
+        {
+          id: '201',
+          title: '孤注一掷',
+          category: '电影',
+          imageUrl: 'https://picsum.photos/300/450?random=201',
+          year: '2023',
+          rating: '8.0',
+          ratingCount: '7千',
+          description: '讲述了一段惊心动魄的赌局故事。',
+          genres: ['剧情', '动作']
         }
       ]
       
@@ -276,46 +287,46 @@ Page({
         {
           id: '301',
           title: '周杰伦2023巡回演唱会',
-          category: '演唱会',
-          imageUrl: 'https://img.mockdata.com/show1.jpg',
+          category: '演出',
+          imageUrl: 'https://picsum.photos/300/450?random=301',
           year: '2023',
           rating: '9.5',
           ratingCount: '2万',
           description: '周杰伦2023"嘉年华"世界巡回演唱会，带来全新舞台和歌单。',
-          genres: ['演唱会', '音乐']
+          genres: ['演唱会', '流行']
         },
         {
           id: '302',
           title: '《猫》音乐剧',
-          category: '音乐剧',
-          imageUrl: 'https://img.mockdata.com/show2.jpg',
+          category: '演出',
+          imageUrl: 'https://picsum.photos/300/450?random=302',
           year: '2023',
           rating: '9.0',
           ratingCount: '1万',
-          description: '由安德鲁·韦伯创作的经典音乐剧，改编自艾略特的诗集《猫》。',
-          genres: ['音乐剧', '戏剧']
+          description: '百老汇经典音乐剧《猫》中文版，原汁原味呈现。',
+          genres: ['音乐剧', '歌舞']
         },
         {
           id: '303',
           title: '《狮子王》音乐剧',
-          category: '音乐剧',
-          imageUrl: 'https://img.mockdata.com/show3.jpg',
-          year: '2022',
+          category: '演出',
+          imageUrl: 'https://picsum.photos/300/450?random=303',
+          year: '2023',
           rating: '9.2',
           ratingCount: '1.5万',
           description: '迪士尼经典音乐剧《狮子王》中文版，震撼视听体验。',
-          genres: ['音乐剧', '动画改编']
+          genres: ['音乐剧', '家庭']
         },
         {
           id: '304',
           title: '五月天2023演唱会',
-          category: '演唱会',
-          imageUrl: 'https://img.mockdata.com/show4.jpg',
+          category: '演出',
+          imageUrl: 'https://picsum.photos/300/450?random=304',
           year: '2023',
           rating: '9.3',
           ratingCount: '1.8万',
           description: '五月天"好好好想见到你"巡回演唱会。',
-          genres: ['演唱会', '音乐']
+          genres: ['演唱会', '流行']
         }
       ]
       
@@ -334,7 +345,7 @@ Page({
             id: '401',
             title: '封神第二部',
             category: '电影',
-            imageUrl: 'https://img.mockdata.com/movie5.jpg',
+            imageUrl: 'https://picsum.photos/300/450?random=401',
             year: '2024',
             director: '乌尔善',
             rating: '暂无',
@@ -346,7 +357,7 @@ Page({
             id: '402',
             title: '周杰伦2024演唱会',
             category: '演唱会',
-            imageUrl: 'https://img.mockdata.com/show5.jpg',
+            imageUrl: 'https://picsum.photos/300/450?random=402',
             year: '2024',
             rating: '暂无',
             ratingCount: '未开售',

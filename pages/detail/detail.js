@@ -95,7 +95,7 @@ Page({
         id: id,
         title: id.startsWith('1') || id.startsWith('2') ? '电影名称' + id : '演出名称' + id,
         category: id.startsWith('1') || id.startsWith('2') ? '电影' : '演出',
-        imageUrl: 'https://img.mockdata.com/detail' + id + '.jpg',
+        imageUrl: `https://picsum.photos/750/1000?random=${id}`,
         rating: '8.7',
         ratingCount: '1.2万',
         year: '2023',
@@ -118,7 +118,7 @@ Page({
         {
           id: 1,
           username: '用户A',
-          avatar: 'https://img.mockdata.com/avatar1.jpg',
+          avatar: 'https://picsum.photos/100/100?random=user1',
           rating: 4.5,
           content: '非常精彩的一部电影，特效很棒，演员表演到位，推荐观看！',
           time: '2023-08-10'
@@ -126,7 +126,7 @@ Page({
         {
           id: 2,
           username: '用户B',
-          avatar: 'https://img.mockdata.com/avatar2.jpg',
+          avatar: 'https://picsum.photos/100/100?random=user2',
           rating: 5,
           content: '我已经看了三遍了，每次都有新的发现，剧情设计得太巧妙了。',
           time: '2023-08-09'
@@ -134,7 +134,7 @@ Page({
         {
           id: 3,
           username: '用户C',
-          avatar: 'https://img.mockdata.com/avatar3.jpg',
+          avatar: 'https://picsum.photos/100/100?random=user3',
           rating: 4,
           content: '整体不错，就是结尾有点仓促，希望能有续集进一步展开。',
           time: '2023-08-08'
@@ -142,10 +142,10 @@ Page({
       ]
 
       const relatedItems = [
-        { id: id + '1', title: '相关推荐1', imageUrl: 'https://img.mockdata.com/related1.jpg', rating: '8.5', ratingCount: '9千' },
-        { id: id + '2', title: '相关推荐2', imageUrl: 'https://img.mockdata.com/related2.jpg', rating: '8.3', ratingCount: '7千' },
-        { id: id + '3', title: '相关推荐3', imageUrl: 'https://img.mockdata.com/related3.jpg', rating: '8.1', ratingCount: '5千' },
-        { id: id + '4', title: '相关推荐4', imageUrl: 'https://img.mockdata.com/related4.jpg', rating: '8.0', ratingCount: '3千' }
+        { id: id + '1', title: '相关推荐1', imageUrl: `https://picsum.photos/300/450?random=${id}1`, rating: '8.5', ratingCount: '9千' },
+        { id: id + '2', title: '相关推荐2', imageUrl: `https://picsum.photos/300/450?random=${id}2`, rating: '8.3', ratingCount: '7千' },
+        { id: id + '3', title: '相关推荐3', imageUrl: `https://picsum.photos/300/450?random=${id}3`, rating: '8.1', ratingCount: '5千' },
+        { id: id + '4', title: '相关推荐4', imageUrl: `https://picsum.photos/300/450?random=${id}4`, rating: '8.0', ratingCount: '3千' }
       ]
 
       this.setData({
