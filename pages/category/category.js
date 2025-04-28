@@ -1,5 +1,5 @@
 // pages/category/category.js
-const app = getApp()
+const api = require('../../utils/api')
 
 Page({
 
@@ -24,22 +24,23 @@ Page({
     },
     allGenres: ['动作', '科幻', '悬疑', '喜剧', '爱情', '动画', '音乐剧', '话剧', '演唱会', '舞蹈', '戏曲'],
     allYears: ['2023', '2022', '2021', '2020', '2019', '2018', '更早'],
-    allRatings: ['9', '8', '7', '6', '5']
+    allRatings: ['9', '8', '7', '6', '5'],
+    type: 'movie', // movie or show
+    movies: [],
+    shows: [],
+    loading: false,
+    hasMore: true
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
-    // Set initial type from options
     if (options.type) {
-      const tab = options.type
       this.setData({
-        currentTab: tab,
-        categoryTitle: this.getTabTitle(tab)
+        type: options.type
       })
     }
-
     this.loadData()
   },
 
@@ -89,9 +90,7 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom() {
-    if (!this.data.isLoading && !this.data.noMore) {
-      this.loadMoreData()
-    }
+    this.loadData()
   },
 
   /**
@@ -205,242 +204,77 @@ Page({
     this.loadData()
   },
 
-  loadData(callback) {
-    this.setData({
-      isLoading: true
-    })
+  async loadData() {
+    if (this.data.loading || !this.data.hasMore) return
 
-    // This would be a real API call in a production app
-    setTimeout(() => {
-      const tab = this.data.currentTab
-      const sortBy = this.data.sortBy
-      const filterOptions = this.data.filterOptions
-      
-      // Generate mock data
-      let items = []
-      
-      // Movie data
-      const movieItems = [
-        {
-          id: '101',
-          title: '流浪地球2',
-          category: '电影',
-          imageUrl: 'https://picsum.photos/300/450?random=101',
-          year: '2023',
-          director: '郭帆',
-          rating: '9.1',
-          ratingCount: '1.2万',
-          description: '讲述了人类为了应对太阳即将毁灭的危机，组织起宏大的太空计划，试图带着地球一起逃离太阳系的故事。',
-          genres: ['科幻', '动作', '冒险']
-        },
-        {
-          id: '102',
-          title: '满江红',
-          category: '电影',
-          imageUrl: 'https://picsum.photos/300/450?random=102',
-          year: '2023',
-          director: '张艺谋',
-          rating: '8.7',
-          ratingCount: '8千',
-          description: '以南宋绍兴年间为背景，讲述了一个关于奸臣当道、忠义两难的故事。',
-          genres: ['悬疑', '剧情', '动作']
-        },
-        {
-          id: '103',
-          title: '独行月球',
-          category: '电影',
-          imageUrl: 'https://picsum.photos/300/450?random=103',
-          year: '2022',
-          director: '张吃鱼',
-          rating: '8.5',
-          ratingCount: '1.5万',
-          description: '讲述了在月球探索过程中，发生的一系列惊险故事。',
-          genres: ['科幻', '喜剧']
-        },
-        {
-          id: '104',
-          title: '长空之王',
-          category: '电影',
-          imageUrl: 'https://picsum.photos/300/450?random=104',
-          year: '2023',
-          director: '刘晓光',
-          rating: '8.3',
-          ratingCount: '6千',
-          description: '讲述了空军王牌飞行员的故事。',
-          genres: ['动作', '剧情']
-        },
-        {
-          id: '201',
-          title: '孤注一掷',
-          category: '电影',
-          imageUrl: 'https://picsum.photos/300/450?random=201',
-          year: '2023',
-          rating: '8.0',
-          ratingCount: '7千',
-          description: '讲述了一段惊心动魄的赌局故事。',
-          genres: ['剧情', '动作']
-        }
-      ]
-      
-      // Show data
-      const showItems = [
-        {
-          id: '301',
-          title: '周杰伦2023巡回演唱会',
-          category: '演出',
-          imageUrl: 'https://picsum.photos/300/450?random=301',
-          year: '2023',
-          rating: '9.5',
-          ratingCount: '2万',
-          description: '周杰伦2023"嘉年华"世界巡回演唱会，带来全新舞台和歌单。',
-          genres: ['演唱会', '流行']
-        },
-        {
-          id: '302',
-          title: '《猫》音乐剧',
-          category: '演出',
-          imageUrl: 'https://picsum.photos/300/450?random=302',
-          year: '2023',
-          rating: '9.0',
-          ratingCount: '1万',
-          description: '百老汇经典音乐剧《猫》中文版，原汁原味呈现。',
-          genres: ['音乐剧', '歌舞']
-        },
-        {
-          id: '303',
-          title: '《狮子王》音乐剧',
-          category: '演出',
-          imageUrl: 'https://picsum.photos/300/450?random=303',
-          year: '2023',
-          rating: '9.2',
-          ratingCount: '1.5万',
-          description: '迪士尼经典音乐剧《狮子王》中文版，震撼视听体验。',
-          genres: ['音乐剧', '家庭']
-        },
-        {
-          id: '304',
-          title: '五月天2023演唱会',
-          category: '演出',
-          imageUrl: 'https://picsum.photos/300/450?random=304',
-          year: '2023',
-          rating: '9.3',
-          ratingCount: '1.8万',
-          description: '五月天"好好好想见到你"巡回演唱会。',
-          genres: ['演唱会', '流行']
-        }
-      ]
-      
-      // Filter by tab
-      if (tab === 'all') {
-        items = [...movieItems, ...showItems]
-      } else if (tab === 'movie') {
-        items = [...movieItems]
-      } else if (tab === 'show') {
-        items = [...showItems]
-      } else if (tab === 'trending') {
-        items = [...movieItems, ...showItems].sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating))
-      } else if (tab === 'upcoming') {
-        items = [
-          {
-            id: '401',
-            title: '封神第二部',
-            category: '电影',
-            imageUrl: 'https://picsum.photos/300/450?random=401',
-            year: '2024',
-            director: '乌尔善',
-            rating: '暂无',
-            ratingCount: '未上映',
-            description: '封神三部曲第二部，讲述妲己、纣王和姜子牙等人物的故事。',
-            genres: ['奇幻', '动作', '神话']
-          },
-          {
-            id: '402',
-            title: '周杰伦2024演唱会',
-            category: '演唱会',
-            imageUrl: 'https://picsum.photos/300/450?random=402',
-            year: '2024',
-            rating: '暂无',
-            ratingCount: '未开售',
-            description: '周杰伦2024年全新巡回演唱会。',
-            genres: ['演唱会', '音乐']
-          }
-        ]
+    this.setData({ loading: true })
+    wx.showLoading({ title: '加载中' })
+
+    try {
+      let data
+      if (this.data.type === 'movie') {
+        // 获取正在热映的电影
+        data = await api.getInTheaters()
+      } else {
+        // 获取即将上映的电影
+        data = await api.getComingSoon()
       }
-      
-      // Apply filters
-      if (filterOptions.genres.length > 0) {
-        items = items.filter(item => {
-          if (!item.genres) return false
-          return filterOptions.genres.some(genre => item.genres.includes(genre))
+
+      const items = data.subjects.map(movie => ({
+        id: movie.id,
+        title: movie.title,
+        imageUrl: movie.images.medium,
+        rating: movie.rating.average.toFixed(1),
+        ratingCount: movie.collect_count + '人评',
+        year: movie.year,
+        director: movie.directors[0]?.name || '未知',
+        category: movie.genres.join(' / ')
+      }))
+
+      if (this.data.type === 'movie') {
+        this.setData({
+          movies: [...this.data.movies, ...items],
+          hasMore: items.length > 0,
+          page: this.data.page + 1
+        })
+      } else {
+        this.setData({
+          shows: [...this.data.shows, ...items],
+          hasMore: items.length > 0,
+          page: this.data.page + 1
         })
       }
-      
-      if (filterOptions.year) {
-        items = items.filter(item => item.year === filterOptions.year)
-      }
-      
-      if (filterOptions.minRating) {
-        items = items.filter(item => {
-          const rating = parseFloat(item.rating)
-          return !isNaN(rating) && rating >= parseFloat(filterOptions.minRating)
-        })
-      }
-      
-      // Apply sorting
-      if (sortBy === 'rating') {
-        items.sort((a, b) => {
-          const ratingA = parseFloat(a.rating) || 0
-          const ratingB = parseFloat(b.rating) || 0
-          return ratingB - ratingA
-        })
-      } else if (sortBy === 'newest') {
-        items.sort((a, b) => {
-          const yearA = parseInt(a.year) || 0
-          const yearB = parseInt(b.year) || 0
-          return yearB - yearA
-        })
-      }
-      
-      // Pagination (mock)
-      const startIndex = 0
-      const endIndex = this.data.pageSize
-      const pageItems = items.slice(startIndex, endIndex)
-      
-      this.setData({
-        items: pageItems,
-        isLoading: false,
-        noMore: items.length <= this.data.pageSize
+    } catch (error) {
+      console.error('获取数据失败:', error)
+      wx.showToast({
+        title: '获取数据失败',
+        icon: 'none'
       })
-      
-      if (callback) callback()
-    }, 1000)
+    } finally {
+      this.setData({ loading: false })
+      wx.hideLoading()
+    }
   },
 
-  loadMoreData() {
-    if (this.data.noMore) return
-    
-    const nextPage = this.data.page + 1
-    
+  switchType(e) {
+    const type = e.currentTarget.dataset.type
+    if (type === this.data.type) return
+
     this.setData({
-      page: nextPage,
-      isLoading: true
+      type,
+      movies: [],
+      shows: [],
+      page: 1,
+      hasMore: true
     })
-    
-    // This would be a real API call in a production app
-    setTimeout(() => {
-      // Mock loading more data - just duplicate existing items with new IDs
-      const moreItems = this.data.items.map(item => ({
-        ...item,
-        id: item.id + '_p' + nextPage,
-        title: item.title + ' ' + nextPage
-      }))
-      
-      this.setData({
-        items: [...this.data.items, ...moreItems],
-        isLoading: false,
-        noMore: nextPage >= 3 // Limit to 3 pages for demo
-      })
-    }, 1000)
+    this.loadData()
+  },
+
+  switchViewMode(e) {
+    const mode = e.currentTarget.dataset.mode
+    this.setData({
+      viewMode: mode
+    })
   },
 
   navigateToDetail(e) {

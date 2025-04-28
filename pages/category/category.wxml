@@ -1,124 +1,88 @@
 <!--pages/category/category.wxml-->
 <view class="container">
-  <!-- Category Header -->
-  <view class="header">
-    <view class="title">{{categoryTitle}}</view>
-    <view class="filter-btn" bindtap="toggleFilter">
-      <text>筛选</text>
-      <image src="/images/filter.png"></image>
+  <!-- 顶部切换栏 -->
+  <view class="tabs">
+    <view 
+      class="tab {{type === 'movie' ? 'active' : ''}}" 
+      bindtap="switchType" 
+      data-type="movie"
+    >
+      电影
+    </view>
+    <view 
+      class="tab {{type === 'show' ? 'active' : ''}}" 
+      bindtap="switchType" 
+      data-type="show"
+    >
+      演出
     </view>
   </view>
 
-  <!-- Category Tabs -->
-  <view class="category-tabs">
-    <scroll-view scroll-x class="scroll-view-x">
-      <view class="tab-container">
-        <view class="tab {{currentTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部</view>
-        <view class="tab {{currentTab === 'movie' ? 'active' : ''}}" bindtap="switchTab" data-tab="movie">电影</view>
-        <view class="tab {{currentTab === 'show' ? 'active' : ''}}" bindtap="switchTab" data-tab="show">演出</view>
-        <view class="tab {{currentTab === 'trending' ? 'active' : ''}}" bindtap="switchTab" data-tab="trending">热门</view>
-        <view class="tab {{currentTab === 'upcoming' ? 'active' : ''}}" bindtap="switchTab" data-tab="upcoming">即将上映</view>
-      </view>
-    </scroll-view>
+  <!-- 视图模式切换 -->
+  <view class="view-mode">
+    <view 
+      class="mode-btn {{viewMode === 'grid' ? 'active' : ''}}" 
+      bindtap="switchViewMode" 
+      data-mode="grid"
+    >
+      <text class="iconfont icon-grid"></text>
+    </view>
+    <view 
+      class="mode-btn {{viewMode === 'list' ? 'active' : ''}}" 
+      bindtap="switchViewMode" 
+      data-mode="list"
+    >
+      <text class="iconfont icon-list"></text>
+    </view>
   </view>
 
-  <!-- Sort Options -->
-  <view class="sort-options">
-    <view class="sort-item {{sortBy === 'default' ? 'active' : ''}}" bindtap="sortByOption" data-sort="default">推荐</view>
-    <view class="sort-item {{sortBy === 'rating' ? 'active' : ''}}" bindtap="sortByOption" data-sort="rating">评分</view>
-    <view class="sort-item {{sortBy === 'newest' ? 'active' : ''}}" bindtap="sortByOption" data-sort="newest">最新</view>
-  </view>
-
-  <!-- Category Content -->
-  <view class="content">
-    <!-- Grid View -->
-    <view class="grid-view" wx:if="{{viewMode === 'grid'}}">
-      <view class="grid-item" wx:for="{{items}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
-        <image class="grid-image" src="{{item.imageUrl}}" mode="aspectFill"></image>
-        <view class="grid-info">
-          <text class="grid-title">{{item.title}}</text>
-          <view class="grid-rating">
-            <text class="rating-score">{{item.rating}}</text>
+  <!-- 内容列表 -->
+  <view class="content-list {{viewMode === 'grid' ? 'grid-view' : 'list-view'}}">
+    <block wx:if="{{type === 'movie'}}">
+      <block wx:for="{{movies}}" wx:key="id">
+        <view class="item" bindtap="navigateToDetail" data-id="{{item.id}}">
+          <image class="poster" src="{{item.imageUrl}}" mode="aspectFill"></image>
+          <view class="info">
+            <view class="title">{{item.title}}</view>
+            <view class="meta">
+              <text class="rating">{{item.rating}}</text>
+              <text class="rating-count">{{item.ratingCount}}</text>
+            </view>
+            <view class="details">
+              <text class="year">{{item.year}}</text>
+              <text class="director">{{item.director}}</text>
+            </view>
+            <view class="category">{{item.category}}</view>
           </view>
         </view>
-      </view>
-    </view>
+      </block>
+    </block>
 
-    <!-- List View -->
-    <view class="list-view" wx:if="{{viewMode === 'list'}}">
-      <view class="list-item" wx:for="{{items}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
-        <image class="list-image" src="{{item.imageUrl}}" mode="aspectFill"></image>
-        <view class="list-info">
-          <text class="list-title">{{item.title}}</text>
-          <view class="list-meta">
-            <text class="list-category">{{item.category}}</text>
-            <text class="list-year">{{item.year}}</text>
+    <block wx:else>
+      <block wx:for="{{shows}}" wx:key="id">
+        <view class="item" bindtap="navigateToDetail" data-id="{{item.id}}">
+          <image class="poster" src="{{item.imageUrl}}" mode="aspectFill"></image>
+          <view class="info">
+            <view class="title">{{item.title}}</view>
+            <view class="meta">
+              <text class="rating">{{item.rating}}</text>
+              <text class="rating-count">{{item.ratingCount}}</text>
+            </view>
+            <view class="details">
+              <text class="year">{{item.year}}</text>
+            </view>
+            <view class="category">{{item.category}}</view>
           </view>
-          <view class="list-rating">
-            <text class="rating-score">{{item.rating}}</text>
-            <text class="rating-count">{{item.ratingCount}}人评</text>
-          </view>
-          <text class="list-description">{{item.description}}</text>
         </view>
-      </view>
-    </view>
+      </block>
+    </block>
   </view>
 
-  <!-- View Mode Toggle -->
-  <view class="view-toggle" bindtap="toggleViewMode">
-    <image src="{{viewMode === 'grid' ? '/images/list_view.png' : '/images/grid_view.png'}}"></image>
+  <!-- 加载更多 -->
+  <view class="loading-more" wx:if="{{loading}}">
+    <text>加载中...</text>
   </view>
-
-  <!-- Loading & No More -->
-  <view class="loading" wx:if="{{isLoading}}">加载中...</view>
-  <view class="no-more" wx:if="{{noMore && items.length > 0}}">没有更多内容了</view>
-  <view class="no-content" wx:if="{{items.length === 0 && !isLoading}}">
-    <image src="/images/no_content.png"></image>
-    <text>暂无内容</text>
-  </view>
-
-  <!-- Filter Panel -->
-  <view class="filter-panel {{showFilter ? 'show' : ''}}">
-    <view class="filter-mask" bindtap="toggleFilter"></view>
-    <view class="filter-content">
-      <view class="filter-header">
-        <text class="filter-title">筛选</text>
-        <view class="filter-close" bindtap="toggleFilter">
-          <image src="/images/close.png"></image>
-        </view>
-      </view>
-
-      <view class="filter-section">
-        <text class="filter-section-title">类型</text>
-        <view class="tag-container">
-          <view class="filter-tag {{filterOptions.genres.includes(item) ? 'active' : ''}}" 
-                wx:for="{{allGenres}}" wx:key="*this" 
-                bindtap="toggleGenreFilter" data-genre="{{item}}">{{item}}</view>
-        </view>
-      </view>
-
-      <view class="filter-section">
-        <text class="filter-section-title">年代</text>
-        <view class="tag-container">
-          <view class="filter-tag {{filterOptions.year === item ? 'active' : ''}}" 
-                wx:for="{{allYears}}" wx:key="*this" 
-                bindtap="setYearFilter" data-year="{{item}}">{{item}}</view>
-        </view>
-      </view>
-
-      <view class="filter-section">
-        <text class="filter-section-title">评分</text>
-        <view class="tag-container">
-          <view class="filter-tag {{filterOptions.minRating === item ? 'active' : ''}}" 
-                wx:for="{{allRatings}}" wx:key="*this" 
-                bindtap="setRatingFilter" data-rating="{{item}}">{{item}}分以上</view>
-        </view>
-      </view>
-
-      <view class="filter-actions">
-        <button class="reset-btn" bindtap="resetFilters">重置</button>
-        <button class="confirm-btn" bindtap="applyFilters">确定</button>
-      </view>
-    </view>
+  <view class="no-more" wx:if="{{!hasMore && !loading}}">
+    <text>没有更多了</text>
   </view>
 </view>
