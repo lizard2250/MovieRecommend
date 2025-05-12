@@ -1,86 +1,71 @@
 <!--pages/search/search.wxml-->
 <view class="container">
+  <!-- Search Bar -->
   <view class="search-header">
     <view class="search-bar">
-      <image class="search-icon" src="/images/search_icon.png"></image>
-      <input class="search-input" placeholder="电影/演出/演员" confirm-type="search" value="{{searchKeyword}}" bindinput="onInputChange" bindconfirm="search" focus="{{autoFocus}}"></input>
-      <view class="clear-icon" bindtap="clearSearch" wx:if="{{searchKeyword}}">
-        <image src="/images/clear.png"></image>
-      </view>
+      <image class="search-icon" src="/images/search.png"></image>
+      <input class="search-input" 
+             placeholder="搜索电影" 
+             value="{{searchText}}"
+             focus="true"
+             confirm-type="search"
+             bindinput="onSearchInput"
+             bindconfirm="onSearch"/>
+      <image class="clear-icon" 
+             src="/images/clear.png" 
+             bindtap="clearSearch" 
+             wx:if="{{searchText}}"></image>
     </view>
-    <view class="search-btn" bindtap="search">搜索</view>
+    <text class="cancel-btn" bindtap="goBack">取消</text>
   </view>
 
   <!-- Search History -->
-  <view class="search-history" wx:if="{{!searchKeyword && searchHistory.length > 0 && !showResults}}">
-    <view class="section-header">
-      <text class="section-title">搜索历史</text>
-      <text class="clear-history" bindtap="clearHistory">清除</text>
+  <view class="search-history" wx:if="{{!searchText && searchHistory.length > 0}}">
+    <view class="history-header">
+      <text class="history-title">搜索历史</text>
+      <image class="delete-icon" src="/images/delete.png" bindtap="clearHistory"></image>
     </view>
     <view class="history-list">
-      <view class="history-item" wx:for="{{searchHistory}}" wx:key="index" bindtap="useHistoryKeyword" data-keyword="{{item}}">
+      <view class="history-item" 
+            wx:for="{{searchHistory}}" 
+            wx:key="*this" 
+            bindtap="onHistoryTap" 
+            data-keyword="{{item}}">
         <image class="history-icon" src="/images/history.png"></image>
         <text class="history-text">{{item}}</text>
       </view>
     </view>
   </view>
 
-  <!-- Hot Search -->
-  <view class="hot-search" wx:if="{{!searchKeyword && !showResults}}">
-    <view class="section-header">
-      <text class="section-title">热门搜索</text>
-    </view>
-    <view class="tag-container">
-      <view class="tag" wx:for="{{hotSearches}}" wx:key="index" bindtap="useHistoryKeyword" data-keyword="{{item}}">{{item}}</view>
-    </view>
-  </view>
-
   <!-- Search Results -->
-  <view class="search-results" wx:if="{{showResults}}">
-    <view class="filter-tabs">
-      <view class="tab {{currentTab === 'all' ? 'active' : ''}}" data-tab="all" bindtap="switchTab">全部</view>
-      <view class="tab {{currentTab === 'movie' ? 'active' : ''}}" data-tab="movie" bindtap="switchTab">电影</view>
-      <view class="tab {{currentTab === 'show' ? 'active' : ''}}" data-tab="show" bindtap="switchTab">演出</view>
+  <view class="search-results" wx:if="{{searchText}}">
+    <view class="loading" wx:if="{{loading}}">
+      <image class="loading-icon" src="/images/loading.gif"></image>
+      <text>搜索中...</text>
+    </view>
+    
+    <view class="no-result" wx:elif="{{results.length === 0 && !loading}}">
+      <image class="no-result-icon" src="/images/no-result.png"></image>
+      <text>暂无相关结果</text>
     </view>
 
-    <view class="result-count">找到 {{resultCount}} 个结果</view>
-
-    <view class="result-list">
-      <view class="result-item" wx:for="{{searchResults}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
-        <image class="result-image" src="{{item.imageUrl}}" mode="aspectFill"></image>
-        <view class="result-info">
-          <view class="result-title">{{item.title}}</view>
-          <view class="result-meta">
-            <text class="result-category">{{item.category}}</text>
-            <text class="result-year">{{item.year}}</text>
-            <text wx:if="{{item.director}}" class="result-director">{{item.director}}</text>
+    <view class="result-list" wx:elif="{{results.length > 0}}">
+      <view class="result-item" 
+            wx:for="{{results}}" 
+            wx:key="id"
+            bindtap="navigateToDetail" 
+            data-id="{{item.movie_id}}">
+        <image class="movie-poster" src="{{item.imageUrl}}" mode="aspectFill"></image>
+        <view class="movie-info">
+          <text class="movie-title">{{item.title}}</text>
+          <text class="movie-original" wx:if="{{item.original_title}}">{{item.original_title}}</text>
+          <view class="movie-meta">
+            <text class="movie-year" wx:if="{{item.year}}">{{item.year}}</text>
+            <text class="movie-rating" wx:if="{{item.rating}}">{{item.rating}} 分</text>
           </view>
-          <view class="result-rating">
-            <text class="rating-score">{{item.rating}}</text>
-            <text class="rating-count">{{item.ratingCount}}人评</text>
-          </view>
-          <text class="result-description">{{item.description}}</text>
+          <text class="movie-genre" wx:if="{{item.genre}}">{{item.genre}}</text>
         </view>
       </view>
-    </view>
-
-    <!-- Loading & No More -->
-    <view class="loading" wx:if="{{isLoading}}">加载中...</view>
-    <view class="no-more" wx:if="{{noMore && searchResults.length > 0}}">没有更多结果了</view>
-    <view class="no-result" wx:if="{{searchResults.length === 0 && !isLoading}}">
-      <image src="/images/no_result.png"></image>
-      <text>未找到相关结果</text>
-      <text class="no-result-tip">换个关键词试试吧</text>
-    </view>
-  </view>
-
-  <!-- AI Suggestions -->
-  <view class="ai-suggestions" wx:if="{{aiSuggestions.length > 0}}">
-    <view class="section-header">
-      <text class="section-title">猜你想搜</text>
-    </view>
-    <view class="tag-container">
-      <view class="tag" wx:for="{{aiSuggestions}}" wx:key="index" bindtap="useHistoryKeyword" data-keyword="{{item}}">{{item}}</view>
     </view>
   </view>
 </view>

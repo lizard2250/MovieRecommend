@@ -1,4 +1,181 @@
 /* pages/detail/detail.wxss */
+.container {
+  padding-bottom: 120rpx;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  padding: 30rpx;
+  background: #f8f8f8;
+}
+
+.poster {
+  width: 240rpx;
+  height: 360rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.info {
+  flex: 1;
+  margin-left: 30rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.other-name {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.rating {
+  margin-bottom: 20rpx;
+}
+
+.score {
+  font-size: 48rpx;
+  color: #ff6b6b;
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+
+.count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.basic-info {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 评分分布 */
+.rating-detail {
+  padding: 30rpx;
+  background: #fff;
+  margin-top: 20rpx;
+}
+
+.rating-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.rating-bars {
+  padding: 10rpx 0;
+}
+
+.rating-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.star-count {
+  width: 80rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.bar-bg {
+  flex: 1;
+  height: 20rpx;
+  background: #f0f0f0;
+  border-radius: 10rpx;
+  margin: 0 20rpx;
+  overflow: hidden;
+}
+
+.bar-active {
+  height: 100%;
+  background: #ffd700;
+  border-radius: 10rpx;
+  transition: width 0.3s ease;
+}
+
+.vote-count {
+  width: 80rpx;
+  font-size: 24rpx;
+  color: #999;
+  text-align: right;
+}
+
+/* 影片信息 */
+.movie-info {
+  padding: 30rpx;
+  background: #fff;
+  margin-top: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+
+.label {
+  width: 120rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.content {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 剧情简介 */
+.summary {
+  padding: 30rpx;
+  background: #fff;
+  margin-top: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.summary-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.summary-content.truncated {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* 操作按钮 */
+.actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
 .header {
   display: flex;
   padding: 20rpx;
@@ -11,19 +188,6 @@
   height: 340rpx;
   border-radius: 8rpx;
   margin-right: 24rpx;
-}
-
-.info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  margin-bottom: 16rpx;
-  line-height: 1.3;
 }
 
 .meta {
@@ -45,13 +209,6 @@
   margin-top: 8rpx;
 }
 
-.rating {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #ff9800;
-  margin-right: 16rpx;
-}
-
 .stars {
   display: flex;
   margin-right: 16rpx;
@@ -66,14 +223,6 @@
 .rating-count {
   font-size: 24rpx;
   color: #999;
-}
-
-.actions {
-  display: flex;
-  justify-content: space-around;
-  padding: 20rpx 0;
-  background-color: #fff;
-  margin-bottom: 20rpx;
 }
 
 .action-item {
@@ -118,23 +267,6 @@
   font-size: 26rpx;
   margin-top: 10rpx;
   text-align: right;
-}
-
-.info-item {
-  display: flex;
-  margin-bottom: 12rpx;
-}
-
-.info-label {
-  font-size: 28rpx;
-  color: #999;
-  width: 160rpx;
-}
-
-.info-value {
-  font-size: 28rpx;
-  color: #333;
-  flex: 1;
 }
 
 .section-header {

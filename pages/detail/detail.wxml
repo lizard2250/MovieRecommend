@@ -1,24 +1,68 @@
 <!--pages/detail/detail.wxml-->
 <view class="container">
+  <!-- 电影海报和基本信息 -->
   <view class="header">
-    <image class="cover" src="{{detail.imageUrl}}" mode="aspectFill"></image>
+    <image class="poster" src="{{detail.imageUrl}}" mode="aspectFill"></image>
     <view class="info">
       <text class="title">{{detail.title}}</text>
-      <view class="meta">
-        <text class="category">{{detail.category}}</text>
-        <text class="year">{{detail.year}}</text>
-        <text wx:if="{{detail.duration}}" class="duration">{{detail.duration}}</text>
+      <text class="other-name" wx:if="{{detail.other_name}}">{{detail.other_name}}</text>
+      <view class="rating">
+        <text class="score">{{detail.rating}}</text>
+        <text class="count">{{detail.vote_num}}人评分</text>
       </view>
-      <view class="rating-container">
-        <text class="rating">{{detail.rating}}</text>
-        <view class="stars">
-          <block wx:for="{{5}}" wx:key="*this">
-            <image class="star" src="{{index < Math.floor(detail.rating/2) ? '/images/star_filled.png' : '/images/star_empty.png'}}"></image>
-          </block>
-        </view>
-        <text class="rating-count">{{detail.ratingCount}}人评</text>
+      <view class="basic-info">
+        <text>{{detail.country}} / {{detail.duration}}</text>
+        <text>{{detail.release_date}} 上映</text>
       </view>
     </view>
+  </view>
+
+  <!-- 评分分布 -->
+  <view class="rating-detail">
+    <view class="rating-title">评分分布</view>
+    <view class="rating-bars">
+      <view class="rating-bar" wx:for="{{[5,4,3,2,1]}}" wx:key="*this">
+        <text class="star-count">{{item}}星</text>
+        <view class="bar-bg">
+          <view class="bar-active" style="width: {{detail['stars'+item]/detail.vote_num*100}}%"></view>
+        </view>
+        <text class="vote-count">{{detail['stars'+item]}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 影片信息 -->
+  <view class="movie-info">
+    <view class="info-item">
+      <text class="label">导演</text>
+      <text class="content">{{detail.director}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">编剧</text>
+      <text class="content">{{detail.editor}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">主演</text>
+      <text class="content">{{detail.actors}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">类型</text>
+      <text class="content">{{detail.genre}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">语言</text>
+      <text class="content">{{detail.language}}</text>
+    </view>
+    <view class="info-item" wx:if="{{detail.IMDb}}">
+      <text class="label">IMDb</text>
+      <text class="content">{{detail.IMDb}}</text>
+    </view>
+  </view>
+
+  <!-- 剧情简介 -->
+  <view class="summary">
+    <view class="section-title">剧情简介</view>
+    <text class="summary-content {{showFullDesc ? '' : 'truncated'}}" bindtap="toggleDesc">{{detail.summary}}</text>
   </view>
 
   <view class="actions">

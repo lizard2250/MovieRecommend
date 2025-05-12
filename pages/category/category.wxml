@@ -1,88 +1,84 @@
 <!--pages/category/category.wxml-->
 <view class="container">
-  <!-- 顶部切换栏 -->
-  <view class="tabs">
-    <view 
-      class="tab {{type === 'movie' ? 'active' : ''}}" 
-      bindtap="switchType" 
-      data-type="movie"
-    >
-      电影
+  <!-- 筛选选项区域 -->
+  <view class="filter-section">
+    <!-- 类型筛选 -->
+    <view class="filter-group">
+      <view class="filter-title">类型</view>
+      <view class="filter-options">
+        <view class="filter-option {{selectedGenre === '' ? 'active' : ''}}" 
+              bindtap="selectGenre" 
+              data-genre="">全部</view>
+        <view class="filter-option {{selectedGenre === item ? 'active' : ''}}" 
+              wx:for="{{genres}}" 
+              wx:key="*this"
+              bindtap="selectGenre" 
+              data-genre="{{item}}">{{item}}</view>
+      </view>
     </view>
-    <view 
-      class="tab {{type === 'show' ? 'active' : ''}}" 
-      bindtap="switchType" 
-      data-type="show"
-    >
-      演出
+
+    <!-- 排序方式 -->
+    <view class="filter-group">
+      <view class="filter-title">排序</view>
+      <view class="filter-options">
+        <view class="filter-option {{selectedSort === index ? 'active' : ''}}" 
+              wx:for="{{sortOptions}}" 
+              wx:key="value"
+              bindtap="selectSort" 
+              data-sort="{{index}}">{{item.text}}</view>
+      </view>
     </view>
   </view>
 
-  <!-- 视图模式切换 -->
-  <view class="view-mode">
-    <view 
-      class="mode-btn {{viewMode === 'grid' ? 'active' : ''}}" 
-      bindtap="switchViewMode" 
-      data-mode="grid"
-    >
-      <text class="iconfont icon-grid"></text>
-    </view>
-    <view 
-      class="mode-btn {{viewMode === 'list' ? 'active' : ''}}" 
-      bindtap="switchViewMode" 
-      data-mode="list"
-    >
-      <text class="iconfont icon-list"></text>
-    </view>
-  </view>
-
-  <!-- 内容列表 -->
-  <view class="content-list {{viewMode === 'grid' ? 'grid-view' : 'list-view'}}">
-    <block wx:if="{{type === 'movie'}}">
-      <block wx:for="{{movies}}" wx:key="id">
-        <view class="item" bindtap="navigateToDetail" data-id="{{item.id}}">
-          <image class="poster" src="{{item.imageUrl}}" mode="aspectFill"></image>
-          <view class="info">
-            <view class="title">{{item.title}}</view>
-            <view class="meta">
-              <text class="rating">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}</text>
+  <!-- 电影列表 -->
+  <scroll-view class="movie-list"
+               scroll-y 
+               bindscrolltolower="onReachBottom"
+               enable-back-to-top>
+    <view class="movie-grid">
+      <view class="movie-item" 
+            wx:for="{{filteredMovies}}" 
+            wx:key="movie_id"
+            bindtap="navigateToDetail" 
+            data-id="{{item.movie_id}}">
+        <image class="movie-poster" 
+               src="{{item.imageUrl}}" 
+               mode="aspectFill"
+               lazy-load></image>
+        <view class="movie-info">
+          <text class="movie-title">{{item.title}}</text>
+          <view class="movie-meta">
+            <view class="movie-rating">
+              <text class="rating-score">{{item.rating || '暂无评分'}}</text>
+              <text class="rating-count" wx:if="{{item.vote_num}}">{{item.vote_num}}人评</text>
             </view>
-            <view class="details">
-              <text class="year">{{item.year}}</text>
-              <text class="director">{{item.director}}</text>
+            <view class="movie-tags">
+              <text class="tag" wx:if="{{item.release_date}}">{{item.release_date}}</text>
+              <text class="tag" wx:if="{{item.genre}}">{{item.genre}}</text>
             </view>
-            <view class="category">{{item.category}}</view>
+            <view class="movie-director" wx:if="{{item.director}}">
+              导演：{{item.director}}
+            </view>
           </view>
         </view>
-      </block>
-    </block>
+      </view>
+    </view>
 
-    <block wx:else>
-      <block wx:for="{{shows}}" wx:key="id">
-        <view class="item" bindtap="navigateToDetail" data-id="{{item.id}}">
-          <image class="poster" src="{{item.imageUrl}}" mode="aspectFill"></image>
-          <view class="info">
-            <view class="title">{{item.title}}</view>
-            <view class="meta">
-              <text class="rating">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}</text>
-            </view>
-            <view class="details">
-              <text class="year">{{item.year}}</text>
-            </view>
-            <view class="category">{{item.category}}</view>
-          </view>
-        </view>
-      </block>
-    </block>
-  </view>
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text>加载中...</text>
+    </view>
 
-  <!-- 加载更多 -->
-  <view class="loading-more" wx:if="{{loading}}">
-    <text>加载中...</text>
-  </view>
-  <view class="no-more" wx:if="{{!hasMore && !loading}}">
-    <text>没有更多了</text>
-  </view>
+    <!-- 无更多数据 -->
+    <view class="no-more" wx:if="{{!loading && !hasMore && filteredMovies.length > 0}}">
+      <text>没有更多数据了</text>
+    </view>
+
+    <!-- 无数据提示 -->
+    <view class="empty" wx:if="{{!loading && filteredMovies.length === 0}}">
+      <view class="empty-icon"></view>
+      <text>暂无相关电影</text>
+    </view>
+  </scroll-view>
 </view>

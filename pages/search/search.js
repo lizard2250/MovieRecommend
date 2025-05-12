@@ -1,5 +1,6 @@
 // pages/search/search.js
 const app = getApp()
+const api = require('../../utils/api')
 
 Page({
 
@@ -7,8 +8,10 @@ Page({
    * 页面的初始数据
    */
   data: {
-    searchKeyword: '',
+    searchText: '',
     searchHistory: [],
+    results: [],
+    loading: false,
     hotSearches: [
       '流浪地球2', '满江红', '周杰伦', '音乐剧', '独行月球', 
       '五月天演唱会', '封神第一部', '奥本海默', '巴比'
@@ -16,7 +19,6 @@ Page({
     showResults: false,
     isLoading: false,
     noMore: false,
-    searchResults: [],
     resultCount: 0,
     currentTab: 'all',
     page: 1,
@@ -32,10 +34,12 @@ Page({
     // If keyword is passed from another page
     if (options.keyword) {
       this.setData({
-        searchKeyword: options.keyword,
+        searchText: options.keyword,
         autoFocus: false
       })
-      this.search()
+      this.onSearch({
+        detail: { value: options.keyword }
+      })
     }
     
     // Load search history
@@ -93,47 +97,59 @@ Page({
 
   },
 
-  onInputChange(e) {
+  onSearchInput(e) {
     this.setData({
-      searchKeyword: e.detail.value
+      searchText: e.detail.value
     })
-    
-    // Clear results when input is cleared
-    if (e.detail.value === '') {
+
+    // 如果输入框为空，清空搜索结果
+    if (!e.detail.value) {
       this.setData({
-        showResults: false,
-        searchResults: [],
-        aiSuggestions: []
-      })
-    }
-    
-    // Show AI suggestions when typing
-    if (e.detail.value.length > 1) {
-      this.getAISuggestions(e.detail.value)
-    } else {
-      this.setData({
-        aiSuggestions: []
+        results: []
       })
     }
   },
 
-  search() {
-    const keyword = this.data.searchKeyword.trim()
+  async onSearch(e) {
+    const keyword = e.detail.value || this.data.searchText
     if (!keyword) return
-    
-    // Save to search history
-    this.saveSearchHistory(keyword)
-    
+
+    // 显示加载状态
     this.setData({
-      isLoading: true,
-      showResults: true,
-      searchResults: [],
-      page: 1,
-      noMore: false,
-      aiSuggestions: []
+      loading: true,
+      results: [] // 清空之前的结果
     })
-    
-    this.fetchSearchResults(keyword, this.data.currentTab, 1)
+
+    try {
+      // 调用搜索API
+      const results = await api.searchMovies(keyword)
+      
+      console.log(`获取到搜索结果: ${results.length}条记录`)
+      
+      // 处理搜索结果
+      const processedResults = results.map(movie => ({
+        ...movie,
+        imageUrl: movie.imageUrl || api.getMoviePoster(movie.movie_id)
+      }))
+
+      // 更新搜索结果
+      this.setData({
+        results: processedResults,
+        loading: false
+      })
+
+      // 保存搜索历史
+      this.saveSearchHistory(keyword)
+    } catch (error) {
+      console.error('搜索失败:', error)
+      wx.showToast({
+        title: '搜索失败',
+        icon: 'none'
+      })
+      this.setData({
+        loading: false
+      })
+    }
   },
 
   loadMoreResults() {
@@ -144,7 +160,7 @@ Page({
       page: nextPage
     })
     
-    this.fetchSearchResults(this.data.searchKeyword, this.data.currentTab, nextPage)
+    this.fetchSearchResults(this.data.searchText, this.data.currentTab, nextPage)
   },
 
   fetchSearchResults(keyword, tab, page) {
@@ -233,7 +249,7 @@ Page({
       const noMore = page >= 3
       
       this.setData({
-        searchResults: page === 1 ? results : [...this.data.searchResults, ...results],
+        results: page === 1 ? results : [...this.data.results, ...results],
         resultCount: 20, // Mock total count
         isLoading: false,
         noMore: noMore
@@ -249,11 +265,11 @@ Page({
         currentTab: tab,
         page: 1,
         noMore: false,
-        searchResults: [],
+        results: [],
         isLoading: true
       })
       
-      this.fetchSearchResults(this.data.searchKeyword, tab, 1)
+      this.fetchSearchResults(this.data.searchText, tab, 1)
     }
   },
 
@@ -291,18 +307,18 @@ Page({
     const keyword = e.currentTarget.dataset.keyword
     
     this.setData({
-      searchKeyword: keyword
+      searchText: keyword
     })
     
-    this.search()
+    this.onSearch({
+      detail: { value: keyword }
+    })
   },
 
   clearSearch() {
     this.setData({
-      searchKeyword: '',
-      showResults: false,
-      searchResults: [],
-      aiSuggestions: []
+      searchText: '',
+      results: []
     })
   },
 
@@ -314,21 +330,25 @@ Page({
   },
 
   saveSearchHistory(keyword) {
+    if (!keyword) return
+    
     let history = wx.getStorageSync('searchHistory') || []
     
-    // Remove duplicate if exists
+    // 如果关键词已存在，先移除
     history = history.filter(item => item !== keyword)
     
-    // Add to beginning of array
+    // 将新关键词添加到开头
     history.unshift(keyword)
     
-    // Limit to 10 items
+    // 限制历史记录最多10条
     if (history.length > 10) {
       history = history.slice(0, 10)
     }
     
+    // 保存到本地
     wx.setStorageSync('searchHistory', history)
     
+    // 更新页面数据
     this.setData({
       searchHistory: history
     })
@@ -353,6 +373,23 @@ Page({
     const id = e.currentTarget.dataset.id
     wx.navigateTo({
       url: `/pages/detail/detail?id=${id}`
+    })
+  },
+
+  goBack() {
+    wx.navigateBack()
+  },
+
+  onHistoryTap(e) {
+    const keyword = e.currentTarget.dataset.keyword
+    console.log('点击历史搜索:', keyword)
+    
+    this.setData({
+      searchText: keyword
+    })
+    
+    this.onSearch({
+      detail: { value: keyword }
     })
   }
 })

@@ -7,10 +7,10 @@ Page({
     hasUserInfo: false,
     userInfo: {},
     banners: [],
-    trending: [],
-    movies: [],
-    shows: [],
-    aiRecommendations: []
+    nowPlaying: [],
+    popular: [],
+    upcoming: [],
+    recommended: []
   },
 
   onLoad() {
@@ -30,7 +30,7 @@ Page({
         hasUserInfo: true,
         userInfo: userInfo
       })
-      this.fetchAIRecommendations()
+      this.fetchRecommendations()
     }
   },
 
@@ -41,49 +41,43 @@ Page({
 
     try {
       // 获取正在热映的电影
-      const inTheaters = await api.getInTheaters()
-      // 获取即将上映的电影
-      const comingSoon = await api.getComingSoon()
+      const movies = await api.getNowPlaying(1)
+      
+      if (movies && movies.length > 0) {
+        // 处理轮播图数据 - 使用前3部电影
+        const banners = movies.slice(0, 3).map(movie => ({
+          id: movie.movie_id,
+          imageUrl: api.getMoviePoster(movie.movie_id),
+          title: movie.title
+        }))
 
-      // 处理轮播图数据
-      const banners = (inTheaters?.subjects || []).slice(0, 3).map(movie => ({
-        id: movie.id,
-        imageUrl: movie.images.large
-      }))
+        // 处理正在热映数据
+        const nowPlaying = movies.map(movie => ({
+          id: movie.movie_id,
+          title: movie.title,
+          imageUrl: api.getMoviePoster(movie.movie_id),
+          rating: movie.rating || '暂无评分',
+          vote_num: movie.vote_num || 0
+        }))
 
-      // 处理热门推荐数据
-      const trending = (inTheaters?.subjects || []).slice(0, 4).map(movie => ({
-        id: movie.id,
-        title: movie.title,
-        imageUrl: movie.images.medium,
-        rating: movie.rating.average.toFixed(1),
-        ratingCount: movie.collect_count + '人评'
-      }))
+        // 获取高分电影（按评分排序）
+        const popular = [...movies]
+          .sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0))
+          .slice(0, 6)
+          .map(movie => ({
+            id: movie.movie_id,
+            title: movie.title,
+            imageUrl: api.getMoviePoster(movie.movie_id),
+            rating: movie.rating || '暂无评分',
+            vote_num: movie.vote_num || 0
+          }))
 
-      // 处理热映电影数据
-      const movies = (inTheaters?.subjects || []).slice(4, 8).map(movie => ({
-        id: movie.id,
-        title: movie.title,
-        imageUrl: movie.images.medium,
-        rating: movie.rating.average.toFixed(1),
-        ratingCount: movie.collect_count + '人评'
-      }))
-
-      // 处理即将上映的电影数据
-      const shows = (comingSoon?.subjects || []).slice(0, 4).map(movie => ({
-        id: movie.id,
-        title: movie.title,
-        imageUrl: movie.images.medium,
-        rating: movie.rating.average.toFixed(1),
-        ratingCount: movie.collect_count + '人评'
-      }))
-
-      this.setData({
-        banners,
-        trending,
-        movies,
-        shows
-      })
+        this.setData({
+          banners,
+          nowPlaying,
+          popular
+        })
+      }
     } catch (error) {
       console.error('获取电影数据失败:', error)
       wx.showToast({
@@ -95,32 +89,35 @@ Page({
     }
   },
 
-  async fetchAIRecommendations() {
+  async fetchRecommendations() {
     try {
-      // 获取用户收藏的电影ID列表
-      const collectList = wx.getStorageSync('collectList') || []
+      // 获取用户收藏的电影列表
+      const collections = wx.getStorageSync('collections') || []
       
-      // 根据用户收藏的电影类型推荐相似电影
-      const recommendations = []
-      for (const movieId of collectList) {
-        const movieDetail = await api.getMovieDetail(movieId)
-        // 获取相似电影
-        const similarMovies = movieDetail.similar_movies || []
-        recommendations.push(...similarMovies.slice(0, 2))
+      if (collections.length > 0) {
+        // 获取收藏电影的详细信息
+        const recommendedMovies = []
+        for (const movieId of collections.slice(0, 3)) {
+          try {
+            const movie = await api.getMovieDetail(movieId)
+            if (movie) {
+              recommendedMovies.push({
+                id: movie.movie_id,
+                title: movie.title,
+                imageUrl: api.getMoviePoster(movie.movie_id),
+                rating: movie.rating || '暂无评分',
+                vote_num: movie.vote_num || 0
+              })
+            }
+          } catch (err) {
+            console.error(`获取电影 ${movieId} 详情失败:`, err)
+          }
+        }
+
+        this.setData({
+          recommended: recommendedMovies
+        })
       }
-
-      // 处理推荐数据
-      const aiRecommendations = recommendations.map(movie => ({
-        id: movie.id,
-        title: movie.title,
-        imageUrl: movie.images.medium,
-        rating: movie.rating.average.toFixed(1),
-        ratingCount: movie.collect_count + '人评'
-      }))
-
-      this.setData({
-        aiRecommendations: aiRecommendations.slice(0, 3) // 只显示前3个推荐
-      })
     } catch (error) {
       console.error('获取推荐数据失败:', error)
     }
@@ -137,6 +134,12 @@ Page({
     const type = e.currentTarget.dataset.type
     wx.navigateTo({
       url: `/pages/category/category?type=${type}`
+    })
+  },
+
+  navigateToSearch() {
+    wx.navigateTo({
+      url: '/pages/search/search'
     })
   },
 

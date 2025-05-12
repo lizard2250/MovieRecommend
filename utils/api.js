@@ -1,6 +1,6 @@
 // utils/api.js
 // 开发环境使用本地服务器，生产环境使用正式域名
-const API_BASE_URL = 'http://localhost:3000/api'  // 开发环境
+const API_BASE_URL = 'http://47.121.24.255'
 // const API_BASE_URL = 'https://your-production-domain.com/api'  // 生产环境
 
 // 模拟电影数据
@@ -60,87 +60,195 @@ const mockShows = [
 ];
 
 // 获取正在热映的电影
-const getInTheaters = () => {
+const getNowPlaying = (page = 1) => {
   return new Promise((resolve, reject) => {
     wx.request({
-      url: `${API_BASE_URL}/in_theaters`,
+      url: `${API_BASE_URL}/mobile/movie/nowplaying/beijing`,
       method: 'GET',
-      header: {
-        'Content-Type': 'application/json'
-      },
-      success: (res) => {
-        resolve(res.data)
-      },
-      fail: (err) => {
-        reject(err)
-      }
-    })
-  })
-}
+      success: async (res) => {
+        try {
+          // 添加调试信息
+          console.log('服务器返回的原始数据:', res);
+          console.log('状态码:', res.statusCode);
+          
+          // 检查状态码
+          if (res.statusCode !== 200) {
+            console.error('服务器响应错误，状态码:', res.statusCode);
+            reject(new Error(`服务器响应错误: ${res.statusCode}`));
+            return;
+          }
 
-// 获取即将上映的电影
-const getComingSoon = () => {
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: `${API_BASE_URL}/coming_soon`,
-      method: 'GET',
-      header: {
-        'Content-Type': 'application/json'
+          // 验证响应数据
+          if (!res.data && res.data !== 0) {
+            console.error('获取电影列表失败：服务器返回空数据');
+            reject(new Error('获取电影列表失败：服务器返回空数据'));
+            return;
+          }
+
+          // 尝试解析数据
+          let movieIds;
+          if (typeof res.data === 'string') {
+            try {
+              movieIds = JSON.parse(res.data);
+            } catch (e) {
+              console.error('解析JSON数据失败:', e);
+              movieIds = [];
+            }
+          } else {
+            movieIds = res.data;
+          }
+
+          // 确保 movieIds 是数组
+          movieIds = Array.isArray(movieIds) ? movieIds : [movieIds];
+          
+          if (movieIds.length === 0) {
+            console.log('当前页面没有正在热映的电影');
+            resolve([]);
+            return;
+          }
+
+          console.log('处理后的电影ID列表:', movieIds);
+
+          // 获取每个电影的详细信息
+          const moviePromises = movieIds.map(item => 
+            new Promise((resolve, reject) => {
+              const movieId = item.movie_id || item;
+              if (!movieId) {
+                console.error('无效的电影ID:', item);
+                resolve(null);
+                return;
+              }
+
+              wx.request({
+                url: `${API_BASE_URL}/mobile/movie/info/${movieId}`,
+                method: 'GET',
+                success: (detailRes) => {
+                  console.log(`电影 ${movieId} 详情:`, detailRes);
+                  if (detailRes.data && detailRes.data.length > 0) {
+                    resolve(detailRes.data[0]);
+                  } else if (detailRes.data) {
+                    resolve(detailRes.data);
+                  } else {
+                    console.error(`电影 ${movieId} 详情获取失败`);
+                    resolve(null);
+                  }
+                },
+                fail: (error) => {
+                  console.error(`获取电影 ${movieId} 详情失败:`, error);
+                  resolve(null);
+                }
+              });
+            })
+          );
+
+          const movies = await Promise.all(moviePromises);
+          // 过滤掉无效的电影数据
+          const validMovies = movies.filter(movie => movie !== null);
+          console.log('最终处理的电影数据:', validMovies);
+          resolve(validMovies);
+        } catch (error) {
+          console.error('处理电影数据时出错:', error);
+          reject(error);
+        }
       },
-      success: (res) => {
-        resolve(res.data)
-      },
-      fail: (err) => {
-        reject(err)
+      fail: (error) => {
+        console.error('请求电影列表失败:', error);
+        reject(error);
       }
-    })
-  })
+    });
+  });
 }
 
 // 获取电影详情
 const getMovieDetail = (id) => {
   return new Promise((resolve, reject) => {
+    console.log(`正在获取电影ID: ${id} 的详情...`);
+    
     wx.request({
-      url: `${API_BASE_URL}/subject/${id}`,
+      url: `${API_BASE_URL}/mobile/movie/info/${id}`,
       method: 'GET',
-      header: {
-        'Content-Type': 'application/json'
-      },
       success: (res) => {
-        resolve(res.data)
+        console.log(`电影详情API返回:`, res);
+        
+        if (res.statusCode !== 200) {
+          console.error(`服务器返回错误状态码: ${res.statusCode}`);
+          reject(new Error(`服务器响应错误: ${res.statusCode}`));
+          return;
+        }
+        
+        if (res.data && res.data.length > 0) {
+          console.log(`成功获取电影详情:`, res.data[0]);
+          resolve(res.data[0]);
+        } else if (res.data) {
+          // 如果返回的不是数组，但有数据
+          console.log(`获取到电影详情(非数组格式):`, res.data);
+          resolve(res.data);
+        } else {
+          console.error(`未找到ID为 ${id} 的电影`);
+          reject(new Error('Movie not found'));
+        }
       },
       fail: (err) => {
-        reject(err)
+        console.error(`请求电影详情失败:`, err);
+        reject(err);
       }
-    })
-  })
+    });
+  });
 }
 
 // 搜索电影
 const searchMovies = (keyword) => {
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: `${API_BASE_URL}/search`,
-      method: 'GET',
-      data: {
-        q: keyword
-      },
-      header: {
-        'Content-Type': 'application/json'
-      },
-      success: (res) => {
-        resolve(res.data)
-      },
-      fail: (err) => {
-        reject(err)
+  console.log(`开始搜索电影，关键词: "${keyword}"`);
+  return new Promise(async (resolve, reject) => {
+    try {
+      // 先获取所有正在热映电影
+      const allMovies = await getNowPlaying(1);
+      
+      if (!allMovies || allMovies.length === 0) {
+        console.log('没有获取到电影数据进行搜索');
+        resolve([]);
+        return;
       }
-    })
-  })
+      
+      console.log(`获取到 ${allMovies.length} 部电影数据用于搜索`);
+      
+      // 过滤符合搜索条件的电影
+      const normalizedKeyword = keyword.toLowerCase();
+      const filteredMovies = allMovies.filter(movie => {
+        // 尝试匹配多个字段
+        const titleMatch = movie.title && movie.title.toLowerCase().includes(normalizedKeyword);
+        const originalTitleMatch = movie.original_title && movie.original_title.toLowerCase().includes(normalizedKeyword);
+        const directorMatch = movie.director && movie.director.toLowerCase().includes(normalizedKeyword);
+        const actorsMatch = movie.actors && movie.actors.toLowerCase().includes(normalizedKeyword);
+        const genreMatch = movie.genre && movie.genre.toLowerCase().includes(normalizedKeyword);
+        
+        return titleMatch || originalTitleMatch || directorMatch || actorsMatch || genreMatch;
+      });
+      
+      console.log(`搜索到 ${filteredMovies.length} 部匹配的电影`);
+      resolve(filteredMovies);
+    } catch (error) {
+      console.error('搜索电影时出错:', error);
+      reject(error);
+    }
+  });
+}
+
+// 获取即将上映的电影
+const getComingSoon = () => {
+  // 由于API没有提供即将上映功能，这里暂时返回正在热映的电影
+  return getNowPlaying(1);
+}
+
+// 获取电影海报
+const getMoviePoster = (movieId) => {
+  return `${API_BASE_URL}/mobile/movie/photo/${movieId}`;
 }
 
 module.exports = {
-  getInTheaters,
-  getComingSoon,
+  getNowPlaying,
   getMovieDetail,
-  searchMovies
+  searchMovies,
+  getComingSoon,
+  getMoviePoster
 } 

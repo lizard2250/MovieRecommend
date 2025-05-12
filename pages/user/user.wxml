@@ -104,6 +104,28 @@
     </scroll-view>
   </view>
 
+  <!-- Recommended Movies Section -->
+  <view class="recent-section card" wx:if="{{hasUserInfo && recommendedMovies.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">为您推荐</text>
+      <text class="more" bindtap="viewAllRecommendations">查看全部 ></text>
+    </view>
+    <scroll-view scroll-x class="scroll-view-x">
+      <view class="item-container">
+        <view class="item" wx:for="{{recommendedMovies}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
+          <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
+          <view class="item-info">
+            <text class="item-title">{{item.title}}</text>
+            <view class="item-rating">
+              <text class="rating-score">{{item.rating}}</text>
+              <text class="rating-count">{{item.ratingCount}}人评</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
   <!-- Logout Button -->
   <view class="logout-section" wx:if="{{hasUserInfo}}">
     <button class="logout-btn" bindtap="logout">退出登录</button>

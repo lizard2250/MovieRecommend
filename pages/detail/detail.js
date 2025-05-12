@@ -1,5 +1,6 @@
 // pages/detail/detail.js
 const app = getApp()
+const api = require('../../utils/api')
 // This would be replaced with an actual chart library in a real app
 import * as mockChart from '../../utils/mock-chart.js'
 
@@ -31,7 +32,7 @@ Page({
       id: id
     })
     this.fetchDetail(id)
-    this.checkUserInteractions(id)
+    this.checkCollection(id)
   },
 
   /**
@@ -80,97 +81,112 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage() {
-
+    const detail = this.data.detail
+    return {
+      title: detail.title,
+      path: `/pages/detail/detail?id=${detail.movie_id}`
+    }
   },
 
-  fetchDetail(id) {
+  async fetchDetail(id) {
     wx.showLoading({
       title: '加载中',
     })
+    
+    console.log(`开始获取电影ID: ${id} 的详情`);
 
-    // Mock data for now - would be replaced with a real API call
-    setTimeout(() => {
-      // Different data based on item type
-      const detail = {
-        id: id,
-        title: id.startsWith('1') || id.startsWith('2') ? '电影名称' + id : '演出名称' + id,
-        category: id.startsWith('1') || id.startsWith('2') ? '电影' : '演出',
-        imageUrl: `https://picsum.photos/750/1000?random=${id}`,
-        rating: '8.7',
-        ratingCount: '1.2万',
-        year: '2023',
-        description: '这是一部非常精彩的作品，融合了悬疑、动作和科幻元素。故事讲述了一个发生在未来世界的冒险，主角通过自己的智慧和勇气，最终战胜了困难，拯救了世界。影片节奏紧凑，特效精良，演员表演出色，是近年来不可多错过的佳作。',
-        director: '张导演',
-        actors: '李明, 王红, 赵强, 陈小',
-        type: '动作/科幻/冒险',
-        language: '中文',
-        duration: '120分钟',
-        venue: id.startsWith('3') ? '北京工人体育馆' : '',
-        showDate: id.startsWith('3') ? '2023-09-15 19:30' : '',
-        sentimentAnalysis: {
-          positive: 75,
-          neutral: 20,
-          negative: 5
-        }
-      }
-
-      const comments = [
-        {
-          id: 1,
-          username: '用户A',
-          avatar: 'https://picsum.photos/100/100?random=user1',
-          rating: 4.5,
-          content: '非常精彩的一部电影，特效很棒，演员表演到位，推荐观看！',
-          time: '2023-08-10'
-        },
-        {
-          id: 2,
-          username: '用户B',
-          avatar: 'https://picsum.photos/100/100?random=user2',
-          rating: 5,
-          content: '我已经看了三遍了，每次都有新的发现，剧情设计得太巧妙了。',
-          time: '2023-08-09'
-        },
-        {
-          id: 3,
-          username: '用户C',
-          avatar: 'https://picsum.photos/100/100?random=user3',
-          rating: 4,
-          content: '整体不错，就是结尾有点仓促，希望能有续集进一步展开。',
-          time: '2023-08-08'
-        }
-      ]
-
-      const relatedItems = [
-        { id: id + '1', title: '相关推荐1', imageUrl: `https://picsum.photos/300/450?random=${id}1`, rating: '8.5', ratingCount: '9千' },
-        { id: id + '2', title: '相关推荐2', imageUrl: `https://picsum.photos/300/450?random=${id}2`, rating: '8.3', ratingCount: '7千' },
-        { id: id + '3', title: '相关推荐3', imageUrl: `https://picsum.photos/300/450?random=${id}3`, rating: '8.1', ratingCount: '5千' },
-        { id: id + '4', title: '相关推荐4', imageUrl: `https://picsum.photos/300/450?random=${id}4`, rating: '8.0', ratingCount: '3千' }
-      ]
-
-      this.setData({
-        detail: detail,
-        comments: comments,
-        relatedItems: relatedItems
+    try {
+      const detail = await api.getMovieDetail(id)
+      console.log(`成功获取电影详情数据:`, detail);
+      
+      // 设置页面标题
+      wx.setNavigationBarTitle({
+        title: detail.title
       })
-
+      
+      // 更新数据，添加图片URL
+      detail.imageUrl = `http://47.121.24.255/mobile/movie/photo/${detail.movie_id}`
+      
+      this.setData({
+        detail: detail
+      })
+      
+      // 添加到浏览历史
+      this.addToHistory(detail);
+      
+    } catch (error) {
+      console.error('获取电影详情失败:', error)
+      
+      // 错误处理
+      if (error.message === 'Movie not found') {
+        wx.showToast({
+          title: '该电影不存在或已下架',
+          icon: 'none',
+          duration: 2000
+        })
+      } else {
+        wx.showToast({
+          title: '获取数据失败，请稍后重试',
+          icon: 'none',
+          duration: 2000
+        })
+      }
+      
+      // 延迟返回上一页
+      setTimeout(() => {
+        wx.navigateBack({
+          delta: 1
+        })
+      }, 2000);
+      
+    } finally {
       wx.hideLoading()
-
-      // Draw chart with mock data
-      this.drawTrendChart()
-    }, 1000)
+    }
   },
 
-  checkUserInteractions(id) {
-    // Check if user has collected or rated this item
-    // This would use real storage or API in a real app
-    const collectList = wx.getStorageSync('collectList') || []
-    const ratingList = wx.getStorageSync('ratingList') || []
-
+  checkCollection(id) {
+    const collections = wx.getStorageSync('collections') || []
     this.setData({
-      isCollected: collectList.includes(id),
-      hasRated: ratingList.some(item => item.id === id)
+      isCollected: collections.includes(id)
     })
+  },
+
+  toggleCollection() {
+    if (!this.checkLogin()) return
+
+    const id = this.data.id
+    let collections = wx.getStorageSync('collections') || []
+    const isCollected = collections.includes(id)
+
+    if (isCollected) {
+      collections = collections.filter(item => item !== id)
+      wx.showToast({
+        title: '已取消收藏',
+        icon: 'success'
+      })
+    } else {
+      collections.push(id)
+      wx.showToast({
+        title: '已收藏',
+        icon: 'success'
+      })
+    }
+
+    wx.setStorageSync('collections', collections)
+    this.setData({
+      isCollected: !isCollected
+    })
+  },
+
+  checkLogin() {
+    if (!wx.getStorageSync('userInfo')) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      })
+      return false
+    }
+    return true
   },
 
   drawTrendChart() {
@@ -181,33 +197,6 @@ Page({
         name: '热度',
         data: [50, 65, 60, 80, 70, 85, 90]
       }]
-    })
-  },
-
-  toggleCollect() {
-    if (!this.checkLogin()) return
-
-    const id = this.data.id
-    const isCollected = this.data.isCollected
-    
-    // This would be a real API call in a production app
-    let collectList = wx.getStorageSync('collectList') || []
-    
-    if (isCollected) {
-      collectList = collectList.filter(item => item !== id)
-    } else {
-      collectList.push(id)
-    }
-    
-    wx.setStorageSync('collectList', collectList)
-    
-    this.setData({
-      isCollected: !isCollected
-    })
-    
-    wx.showToast({
-      title: isCollected ? '已取消收藏' : '已加入收藏',
-      icon: 'success'
     })
   },
 
@@ -297,7 +286,7 @@ Page({
 
   toggleDescription() {
     this.setData({
-      showFullDesc: true
+      showFullDesc: !this.data.showFullDesc
     })
   },
 
@@ -308,14 +297,39 @@ Page({
     })
   },
 
-  checkLogin() {
-    if (!wx.getStorageSync('userInfo')) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      })
-      return false
+  // 添加到浏览历史
+  addToHistory(movieDetail) {
+    try {
+      // 获取现有历史记录
+      let history = wx.getStorageSync('browsing_history') || [];
+      
+      // 检查是否已经存在该电影
+      const existingIndex = history.findIndex(item => item.movie_id === movieDetail.movie_id);
+      
+      // 如果已存在，先移除
+      if (existingIndex > -1) {
+        history.splice(existingIndex, 1);
+      }
+      
+      // 添加到历史记录开头
+      history.unshift({
+        movie_id: movieDetail.movie_id,
+        title: movieDetail.title,
+        imageUrl: movieDetail.imageUrl,
+        rating: movieDetail.rating,
+        timestamp: new Date().getTime()
+      });
+      
+      // 限制历史记录最多50条
+      if (history.length > 50) {
+        history = history.slice(0, 50);
+      }
+      
+      // 保存到本地存储
+      wx.setStorageSync('browsing_history', history);
+      
+    } catch (error) {
+      console.error('保存浏览历史失败:', error);
     }
-    return true
   }
 })

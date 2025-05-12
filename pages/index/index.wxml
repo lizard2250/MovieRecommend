@@ -1,27 +1,34 @@
 <!--index.wxml-->
 <view class="container">
+  <!-- Search Bar -->
+  <view class="search-bar" bindtap="navigateToSearch">
+    <image class="search-icon" src="/images/search.png"></image>
+    <text class="search-placeholder">搜索电影</text>
+  </view>
+
   <!-- Banner Carousel -->
   <swiper class="banner" indicator-dots autoplay circular>
     <swiper-item wx:for="{{banners}}" wx:key="id">
       <image src="{{item.imageUrl}}" mode="aspectFill" data-id="{{item.id}}" bindtap="navigateToDetail"></image>
+      <view class="banner-title">{{item.title}}</view>
     </swiper-item>
   </swiper>
 
-  <!-- Trending Section -->
+  <!-- Now Playing Section -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">热门推荐</text>
-      <text class="more" bindtap="navigateToCategory" data-type="trending">更多 ></text>
+      <text class="section-title">正在热映</text>
+      <text class="more" bindtap="navigateToCategory" data-type="nowPlaying">更多 ></text>
     </view>
     <scroll-view scroll-x class="scroll-view-x">
       <view class="item-container">
-        <view class="item" wx:for="{{trending}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
+        <view class="item" wx:for="{{nowPlaying}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
           <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
           <view class="item-info">
             <text class="item-title">{{item.title}}</text>
             <view class="item-rating">
               <text class="rating-score">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}人评</text>
+              <text class="rating-count">{{item.vote_num}}人评</text>
             </view>
           </view>
         </view>
@@ -29,21 +36,21 @@
     </scroll-view>
   </view>
 
-  <!-- Movie Section -->
+  <!-- Popular Movies Section -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">热映电影</text>
-      <text class="more" bindtap="navigateToCategory" data-type="movie">更多 ></text>
+      <text class="section-title">高分电影</text>
+      <text class="more" bindtap="navigateToCategory" data-type="popular">更多 ></text>
     </view>
     <scroll-view scroll-x class="scroll-view-x">
       <view class="item-container">
-        <view class="item" wx:for="{{movies}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
+        <view class="item" wx:for="{{popular}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
           <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
           <view class="item-info">
             <text class="item-title">{{item.title}}</text>
             <view class="item-rating">
               <text class="rating-score">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}人评</text>
+              <text class="rating-count">{{item.vote_num}}人评</text>
             </view>
           </view>
         </view>
@@ -51,52 +58,31 @@
     </scroll-view>
   </view>
 
-  <!-- Show Section -->
-  <view class="section">
+  <!-- Recommendations Section -->
+  <view class="section" wx:if="{{recommended.length > 0}}">
     <view class="section-header">
-      <text class="section-title">热门演出</text>
-      <text class="more" bindtap="navigateToCategory" data-type="show">更多 ></text>
+      <text class="section-title">为你推荐</text>
     </view>
-    <scroll-view scroll-x class="scroll-view-x">
-      <view class="item-container">
-        <view class="item" wx:for="{{shows}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
-          <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
-          <view class="item-info">
-            <text class="item-title">{{item.title}}</text>
-            <view class="item-rating">
-              <text class="rating-score">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}人评</text>
+    <view class="recommendation-container">
+      <scroll-view scroll-x class="scroll-view-x">
+        <view class="item-container">
+          <view class="item" wx:for="{{recommended}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
+            <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
+            <view class="item-info">
+              <text class="item-title">{{item.title}}</text>
+              <view class="item-rating">
+                <text class="rating-score">{{item.rating}}</text>
+                <text class="rating-count">{{item.vote_num}}人评</text>
+              </view>
             </view>
           </view>
         </view>
-      </view>
-    </scroll-view>
+      </scroll-view>
+    </view>
   </view>
 
-  <!-- AI Recommendation -->
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">专属推荐</text>
-    </view>
-    <view class="ai-recommendation card" wx:if="{{hasUserInfo}}">
-      <view class="ai-header">
-        <text>根据您的喜好，我们推荐：</text>
-      </view>
-      <view class="item-container">
-        <view class="item" wx:for="{{aiRecommendations}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
-          <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
-          <view class="item-info">
-            <text class="item-title">{{item.title}}</text>
-            <view class="item-rating">
-              <text class="rating-score">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}人评</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-    <view class="login-prompt card" wx:else bindtap="navigateToUser">
-      <text>登录后查看个性化推荐 ></text>
-    </view>
+  <!-- Login Prompt -->
+  <view class="login-prompt card" wx:if="{{!hasUserInfo}}" bindtap="navigateToUser">
+    <text>登录后查看更多个性化推荐 ></text>
   </view>
 </view>
