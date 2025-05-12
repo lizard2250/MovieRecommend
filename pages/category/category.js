@@ -330,20 +330,33 @@ Page({
         actors: movie.actors || ''
       }));
 
-      // 更新数据 - 同时更新movies和filteredMovies
-      const newMovies = isRefresh ? items : [...this.data.movies, ...items];
+      // 更新数据
+      let newMovies;
+      if (isRefresh) {
+        // 刷新时直接使用新数据
+        newMovies = items;
+      } else {
+        // 加载更多时，检查重复并合并数据
+        const existingIds = this.data.movies.map(m => m.movie_id);
+        const uniqueNewItems = items.filter(item => !existingIds.includes(item.movie_id));
+        newMovies = [...this.data.movies, ...uniqueNewItems];
+      }
       
       this.setData({
         movies: newMovies,
-        filteredMovies: isRefresh ? items : [...this.data.filteredMovies, ...items],
         page: this.data.page + 1,
-        hasMore: items.length === this.data.pageSize || items.length > 0,
+        hasMore: items.length === this.data.pageSize,
         loading: false
       });
       
       // 如果有筛选条件，应用筛选
       if (this.data.selectedGenre || this.data.selectedSort > 0) {
         this.applyFilters();
+      } else {
+        // 如果没有筛选条件，直接更新filteredMovies
+        this.setData({
+          filteredMovies: newMovies
+        });
       }
 
     } catch (error) {

@@ -61,55 +61,104 @@
 
 /* 评分分布 */
 .rating-detail {
-  padding: 30rpx;
   background: #fff;
-  margin-top: 20rpx;
+  padding: 30rpx;
+  margin: 20rpx 0;
+  border-radius: 12rpx;
 }
 
 .rating-title {
   font-size: 30rpx;
-  font-weight: bold;
+  font-weight: 500;
   color: #333;
-  margin-bottom: 20rpx;
+  margin-bottom: 30rpx;
+  padding-left: 10rpx;
 }
 
 .rating-bars {
-  padding: 10rpx 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding: 0 10rpx;
 }
 
 .rating-bar {
   display: flex;
   align-items: center;
-  margin-bottom: 15rpx;
+  gap: 15rpx;
 }
 
 .star-count {
   width: 80rpx;
   font-size: 24rpx;
   color: #666;
+  text-align: right;
 }
 
 .bar-bg {
   flex: 1;
-  height: 20rpx;
-  background: #f0f0f0;
-  border-radius: 10rpx;
-  margin: 0 20rpx;
+  height: 24rpx;
+  background: #e0e0e0;
+  border-radius: 12rpx;
   overflow: hidden;
+  position: relative;
+}
+
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  padding: 0 2rpx;
+}
+
+.grid-line {
+  width: 2rpx;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .bar-active {
+  position: absolute;
+  left: 0;
+  top: 0;
   height: 100%;
   background: #ffd700;
-  border-radius: 10rpx;
-  transition: width 0.3s ease;
+  border-radius: 12rpx;
+  transition: width 0.3s ease-in-out;
+}
+
+/* 添加百分比标签 */
+.bar-bg::after {
+  content: '';
+  position: absolute;
+  top: -24rpx;
+  right: 0;
+  font-size: 20rpx;
+  color: #999;
 }
 
 .vote-count {
   width: 80rpx;
   font-size: 24rpx;
   color: #999;
-  text-align: right;
+  margin-left: 10rpx;
+}
+
+/* 当比例为0时的特殊样式 */
+.bar-active.empty {
+  width: 0 !important;
+  background: #e0e0e0;
+}
+
+/* 当比例很小时的最小宽度 */
+.bar-active.minimal {
+  min-width: 12rpx;
+  background: #ffd700;
 }
 
 /* 影片信息 */

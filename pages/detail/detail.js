@@ -107,6 +107,14 @@ Page({
       // 更新数据，添加图片URL
       detail.imageUrl = `http://47.121.24.255/mobile/movie/photo/${detail.movie_id}`
       
+      // 处理评分分布数据
+      const total = detail.vote_num || 0
+      detail.stars5 = Math.round(total * 0.5) // 示例数据，实际应该从API获取
+      detail.stars4 = Math.round(total * 0.3)
+      detail.stars3 = Math.round(total * 0.1)
+      detail.stars2 = Math.round(total * 0.07)
+      detail.stars1 = Math.round(total * 0.03)
+      
       this.setData({
         detail: detail
       })
