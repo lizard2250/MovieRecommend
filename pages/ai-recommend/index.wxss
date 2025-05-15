@@ -1,0 +1,346 @@
+.container {
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  min-height: 100vh;
+}
+
+/* 加载动画 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 999;
+}
+
+.loading {
+  width: 100rpx;
+  height: 100rpx;
+}
+
+/* 页面标题 */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40rpx;
+  padding: 20rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+  text-align: center;
+}
+
+/* 输入框样式 */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  margin: 30rpx 20rpx;
+}
+
+.search-textarea {
+  width: 100%;
+  min-height: 180rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  margin-bottom: 30rpx;
+}
+
+.search-btn {
+  width: 80%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #3a86ff;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  padding: 0;
+  margin: 0 auto;
+}
+
+/* 电影容器样式 */
+.movie-container {
+  margin: 20rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.movie-item {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.movie-poster {
+  width: 100%;
+  height: 400rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.movie-info {
+  margin-bottom: 20rpx;
+}
+
+.movie-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.movie-genre {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.movie-rating {
+  font-size: 24rpx;
+  color: #ff9500;
+  display: block;
+}
+
+/* 进度指示器 */
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  margin: 20rpx 0 30rpx;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background-color: #ddd;
+  margin: 0 8rpx;
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background-color: #3a86ff;
+  transform: scale(1.2);
+}
+
+/* 反馈按钮样式 */
+.feedback-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20rpx;
+}
+
+.feedback-btn {
+  flex: 1;
+  height: 70rpx;
+  line-height: 70rpx;
+  margin: 0 10rpx;
+  font-size: 26rpx;
+  border-radius: 35rpx;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 0;
+  transition: all 0.3s;
+}
+
+.feedback-btn:first-child {
+  margin-left: 0;
+}
+
+.feedback-btn:last-child {
+  margin-right: 0;
+}
+
+.feedback-btn.active {
+  background-color: #3a86ff;
+  color: #fff;
+  font-weight: bold;
+  transform: scale(1.05);
+  box-shadow: 0 2rpx 8rpx rgba(58, 134, 255, 0.3);
+}
+
+/* 按钮颜色 */
+.feedback-btn[data-feedback="1"].active {
+  background-color: #4caf50; /* 喜欢-绿色 */
+}
+
+.feedback-btn[data-feedback="0"].active {
+  background-color: #ffc107; /* 中立-黄色 */
+}
+
+.feedback-btn[data-feedback="-1"].active {
+  background-color: #f44336; /* 不喜欢-红色 */
+}
+
+/* 生成推荐按钮 */
+.generate-btn {
+  width: 80%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #3a86ff;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  margin: 20rpx auto;
+  font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(58, 134, 255, 0.3);
+  transition: all 0.3s;
+}
+
+.generate-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 6rpx rgba(58, 134, 255, 0.3);
+}
+
+/* 推荐结果样式 */
+.recommendation-list {
+  margin: 20rpx 0;
+}
+
+.recommendation-item {
+  background-color: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.recommendation-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+}
+
+.rating-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ai-rating {
+  font-size: 28rpx;
+  color: #3a86ff;
+  font-weight: bold;
+  margin-bottom: 6rpx;
+}
+
+.douban-rating {
+  font-size: 24rpx;
+  color: #ff9500;
+}
+
+/* 推荐指数样式 */
+.recommendation-score {
+  margin: 30rpx 0;
+}
+
+.score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.score-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.score-value {
+  font-size: 32rpx;
+  color: #3a86ff;
+  font-weight: bold;
+}
+
+.score-max {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: normal;
+}
+
+.score-bar-container {
+  width: 100%;
+  height: 16rpx;
+  background-color: #f0f0f0;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.score-bar {
+  height: 100%;
+  background-color: #3a86ff;
+  border-radius: 8rpx;
+  transition: width 0.5s ease-out;
+}
+
+.recommendation-reasons {
+  margin-top: 20rpx;
+}
+
+.reason {
+  margin-bottom: 20rpx;
+}
+
+.reason-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 10rpx;
+}
+
+.reason-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.reason.good .reason-text {
+  color: #4caf50;
+}
+
+.reason.bad .reason-text {
+  color: #ff7043;
+}
+
+/* 重新开始按钮 */
+.restart-btn {
+  width: 80%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #3a86ff;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  margin: 40rpx auto;
+} 

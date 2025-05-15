@@ -1,8 +1,6 @@
 // pages/detail/detail.js
 const app = getApp()
 const api = require('../../utils/api')
-// This would be replaced with an actual chart library in a real app
-import * as mockChart from '../../utils/mock-chart.js'
 
 Page({
 
@@ -12,15 +10,7 @@ Page({
   data: {
     id: null,
     detail: {},
-    comments: [],
-    relatedItems: [],
-    isCollected: false,
-    hasRated: false,
-    showRatingDialog: false,
-    currentRating: 0,
-    userComment: '',
-    showFullDesc: false,
-    ratingHints: ['很差', '较差', '还行', '推荐', '力荐']
+    showFullDesc: false
   },
 
   /**
@@ -32,7 +22,6 @@ Page({
       id: id
     })
     this.fetchDetail(id)
-    this.checkCollection(id)
   },
 
   /**
@@ -105,15 +94,7 @@ Page({
       })
       
       // 更新数据，添加图片URL
-      detail.imageUrl = `http://47.121.24.255/mobile/movie/photo/${detail.movie_id}`
-      
-      // 处理评分分布数据
-      const total = detail.vote_num || 0
-      detail.stars5 = Math.round(total * 0.5) // 示例数据，实际应该从API获取
-      detail.stars4 = Math.round(total * 0.3)
-      detail.stars3 = Math.round(total * 0.1)
-      detail.stars2 = Math.round(total * 0.07)
-      detail.stars1 = Math.round(total * 0.03)
+      detail.imageUrl = `http://47.120.72.255/mobile/movie/photo/${detail.movie_id}`
       
       this.setData({
         detail: detail
@@ -152,156 +133,9 @@ Page({
     }
   },
 
-  checkCollection(id) {
-    const collections = wx.getStorageSync('collections') || []
-    this.setData({
-      isCollected: collections.includes(id)
-    })
-  },
-
-  toggleCollection() {
-    if (!this.checkLogin()) return
-
-    const id = this.data.id
-    let collections = wx.getStorageSync('collections') || []
-    const isCollected = collections.includes(id)
-
-    if (isCollected) {
-      collections = collections.filter(item => item !== id)
-      wx.showToast({
-        title: '已取消收藏',
-        icon: 'success'
-      })
-    } else {
-      collections.push(id)
-      wx.showToast({
-        title: '已收藏',
-        icon: 'success'
-      })
-    }
-
-    wx.setStorageSync('collections', collections)
-    this.setData({
-      isCollected: !isCollected
-    })
-  },
-
-  checkLogin() {
-    if (!wx.getStorageSync('userInfo')) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      })
-      return false
-    }
-    return true
-  },
-
-  drawTrendChart() {
-    // This would use a real chart library in a real app
-    mockChart.drawLineChart('trendChart', {
-      categories: ['1月', '2月', '3月', '4月', '5月', '6月', '7月'],
-      series: [{
-        name: '热度',
-        data: [50, 65, 60, 80, 70, 85, 90]
-      }]
-    })
-  },
-
-  toggleRating() {
-    if (!this.checkLogin()) return
-
-    this.setData({
-      showRatingDialog: true,
-      currentRating: 0,
-      userComment: ''
-    })
-  },
-
-  closeRatingDialog() {
-    this.setData({
-      showRatingDialog: false
-    })
-  },
-
-  selectRating(e) {
-    const rating = e.currentTarget.dataset.rating
-    this.setData({
-      currentRating: rating
-    })
-  },
-
-  onCommentInput(e) {
-    this.setData({
-      userComment: e.detail.value
-    })
-  },
-
-  submitRating() {
-    if (this.data.currentRating === 0) {
-      wx.showToast({
-        title: '请选择评分',
-        icon: 'none'
-      })
-      return
-    }
-
-    // This would be a real API call in a production app
-    const ratingData = {
-      id: this.data.id,
-      rating: this.data.currentRating,
-      comment: this.data.userComment,
-      date: new Date().toISOString().split('T')[0]
-    }
-    
-    let ratingList = wx.getStorageSync('ratingList') || []
-    const existingIndex = ratingList.findIndex(item => item.id === this.data.id)
-    
-    if (existingIndex !== -1) {
-      ratingList[existingIndex] = ratingData
-    } else {
-      ratingList.push(ratingData)
-    }
-    
-    wx.setStorageSync('ratingList', ratingList)
-    
-    this.setData({
-      showRatingDialog: false,
-      hasRated: true
-    })
-    
-    wx.showToast({
-      title: '评分成功',
-      icon: 'success'
-    })
-  },
-
-  navigateToComments() {
-    // Would navigate to a comments page in a real app
-    wx.showToast({
-      title: '查看全部评论',
-      icon: 'none'
-    })
-  },
-
-  share() {
-    // Would open share dialog in a real app
-    wx.showToast({
-      title: '分享功能开发中',
-      icon: 'none'
-    })
-  },
-
-  toggleDescription() {
+  toggleDesc() {
     this.setData({
       showFullDesc: !this.data.showFullDesc
-    })
-  },
-
-  navigateToDetail(e) {
-    const id = e.currentTarget.dataset.id
-    wx.navigateTo({
-      url: `/pages/detail/detail?id=${id}`
     })
   },
 

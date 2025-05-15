@@ -1,6 +1,6 @@
 // utils/api.js
 // 开发环境使用本地服务器，生产环境使用正式域名
-const API_BASE_URL = 'http://47.121.24.255'
+const API_BASE_URL = 'http://47.120.72.255'
 // const API_BASE_URL = 'https://your-production-domain.com/api'  // 生产环境
 
 // 模拟电影数据
@@ -245,10 +245,45 @@ const getMoviePoster = (movieId) => {
   return `${API_BASE_URL}/mobile/movie/photo/${movieId}`;
 }
 
+// 获取AI推荐电影
+const getAiRecommendations = (uid, preferences) => {
+  console.log(`获取用户 ${uid} 的AI推荐，偏好:`, preferences);
+  return new Promise((resolve, reject) => {
+    // 实际项目中应该调用真实的AI推荐API
+    // 这里我们使用 /mobile/movie/recommend/{uid} 接口
+    wx.request({
+      url: `${API_BASE_URL}/mobile/movie/recommend/${uid}`,
+      method: 'GET',
+      success: (res) => {
+        console.log('AI推荐API返回:', res);
+        
+        if (res.statusCode !== 200) {
+          console.error(`服务器返回错误状态码: ${res.statusCode}`);
+          reject(new Error(`服务器响应错误: ${res.statusCode}`));
+          return;
+        }
+        
+        if (res.data) {
+          console.log('成功获取AI推荐:', res.data);
+          resolve(res.data);
+        } else {
+          console.error('AI推荐API返回空数据');
+          reject(new Error('AI推荐API返回空数据'));
+        }
+      },
+      fail: (err) => {
+        console.error('请求AI推荐失败:', err);
+        reject(err);
+      }
+    });
+  });
+}
+
 module.exports = {
   getNowPlaying,
   getMovieDetail,
   searchMovies,
   getComingSoon,
-  getMoviePoster
+  getMoviePoster,
+  getAiRecommendations
 } 

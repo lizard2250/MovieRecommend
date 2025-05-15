@@ -15,54 +15,10 @@
         </view>
       </block>
     </view>
-    
-    <view class="user-stats" wx:if="{{hasUserInfo}}">
-      <view class="stat-item">
-        <text class="stat-value">{{stats.ratingCount}}</text>
-        <text class="stat-label">评分</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-value">{{stats.collectCount}}</text>
-        <text class="stat-label">收藏</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-value">{{stats.commentCount}}</text>
-        <text class="stat-label">评论</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- User Preference Summary -->
-  <view class="preference-section card" wx:if="{{hasUserInfo}}">
-    <view class="section-title">您的观影偏好</view>
-    <view class="tag-container">
-      <view class="tag" wx:for="{{userPreferences.tags}}" wx:key="*this">{{item}}</view>
-    </view>
-    <view class="chart-container">
-      <canvas canvas-id="preferenceChart" class="preference-chart"></canvas>
-    </view>
   </view>
 
   <!-- Menu Section -->
   <view class="menu-section card">
-    <view class="menu-group">
-      <view class="menu-item" bindtap="navigateToCollections">
-        <image class="menu-icon" src="/images/collect.png"></image>
-        <text class="menu-text">我的收藏</text>
-        <text class="menu-arrow">></text>
-      </view>
-      <view class="menu-item" bindtap="navigateToRatings">
-        <image class="menu-icon" src="/images/rating.png"></image>
-        <text class="menu-text">我的评分</text>
-        <text class="menu-arrow">></text>
-      </view>
-      <view class="menu-item" bindtap="navigateToHistory">
-        <image class="menu-icon" src="/images/history.png"></image>
-        <text class="menu-text">浏览历史</text>
-        <text class="menu-arrow">></text>
-      </view>
-    </view>
-
     <view class="menu-group">
       <view class="menu-item" bindtap="navigateToSettings">
         <image class="menu-icon" src="/images/settings.png"></image>
@@ -80,50 +36,6 @@
         <text class="menu-arrow">></text>
       </view>
     </view>
-  </view>
-  
-  <!-- Recently Viewed Section -->
-  <view class="recent-section card" wx:if="{{hasUserInfo && recentItems.length > 0}}">
-    <view class="section-header">
-      <text class="section-title">最近浏览</text>
-      <text class="more" bindtap="navigateToHistory">查看全部 ></text>
-    </view>
-    <scroll-view scroll-x class="scroll-view-x">
-      <view class="item-container">
-        <view class="item" wx:for="{{recentItems}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
-          <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
-          <view class="item-info">
-            <text class="item-title">{{item.title}}</text>
-            <view class="item-rating">
-              <text class="rating-score">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}人评</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- Recommended Movies Section -->
-  <view class="recent-section card" wx:if="{{hasUserInfo && recommendedMovies.length > 0}}">
-    <view class="section-header">
-      <text class="section-title">为您推荐</text>
-      <text class="more" bindtap="viewAllRecommendations">查看全部 ></text>
-    </view>
-    <scroll-view scroll-x class="scroll-view-x">
-      <view class="item-container">
-        <view class="item" wx:for="{{recommendedMovies}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
-          <image src="{{item.imageUrl}}" mode="aspectFill" class="item-image"></image>
-          <view class="item-info">
-            <text class="item-title">{{item.title}}</text>
-            <view class="item-rating">
-              <text class="rating-score">{{item.rating}}</text>
-              <text class="rating-count">{{item.ratingCount}}人评</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </scroll-view>
   </view>
 
   <!-- Logout Button -->

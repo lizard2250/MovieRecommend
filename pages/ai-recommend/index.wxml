@@ -1,0 +1,129 @@
+<view class="container">
+  <!-- 加载中 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <image class="loading" src="/images/loading.gif" mode="aspectFit"></image>
+  </view>
+
+  <!-- 步骤1: 输入想看的电影类型 -->
+  <block wx:if="{{step === 'input'}}">
+    <view class="header">
+      <text class="title">电影推荐</text>
+      <text class="subtitle">告诉我你想看什么类型的电影</text>
+    </view>
+
+    <view class="input-container">
+      <textarea 
+        class="search-textarea" 
+        placeholder="例如: 想看科幻片、想看悬疑电影..." 
+        value="{{inputValue}}"
+        bindinput="onInputChange"
+        maxlength="200"
+        auto-height
+        show-confirm-bar="{{false}}"
+      ></textarea>
+      <button class="search-btn" bindtap="onSubmitInput">开始推荐</button>
+    </view>
+  </block>
+
+  <!-- 步骤2: 选择喜好 -->
+  <block wx:elif="{{step === 'selection'}}">
+    <view class="header">
+      <text class="title">给电影评价</text>
+      <text class="subtitle">请告诉我您对这部电影的感觉 ({{currentMovieIndex + 1}}/{{candidateMovies.length}})</text>
+    </view>
+
+    <view class="movie-container" wx:if="{{candidateMovies.length > 0}}">
+      <view class="movie-item">
+        <image 
+          class="movie-poster" 
+          src="{{candidateMovies[currentMovieIndex].imageUrl}}" 
+          mode="aspectFill" 
+          binderror="onImageError" 
+          data-id="{{candidateMovies[currentMovieIndex].id}}"
+        ></image>
+        <view class="movie-info">
+          <text class="movie-title">{{candidateMovies[currentMovieIndex].title}}</text>
+          <text class="movie-genre">{{candidateMovies[currentMovieIndex].genre}}</text>
+          <text class="movie-rating">评分: {{candidateMovies[currentMovieIndex].rating}}</text>
+        </view>
+        <view class="feedback-btns">
+          <button 
+            class="feedback-btn {{feedback[candidateMovies[currentMovieIndex].id] === 1 ? 'active' : ''}}" 
+            data-movie-id="{{candidateMovies[currentMovieIndex].id}}" 
+            data-feedback="1" 
+            bindtap="onMovieFeedback"
+          >喜欢</button>
+          <button 
+            class="feedback-btn {{feedback[candidateMovies[currentMovieIndex].id] === 0 ? 'active' : ''}}" 
+            data-movie-id="{{candidateMovies[currentMovieIndex].id}}" 
+            data-feedback="0" 
+            bindtap="onMovieFeedback"
+          >中立</button>
+          <button 
+            class="feedback-btn {{feedback[candidateMovies[currentMovieIndex].id] === -1 ? 'active' : ''}}" 
+            data-movie-id="{{candidateMovies[currentMovieIndex].id}}" 
+            data-feedback="-1" 
+            bindtap="onMovieFeedback"
+          >不喜欢</button>
+        </view>
+      </view>
+
+      <!-- 进度指示器 -->
+      <view class="progress-dots">
+        <block wx:for="{{candidateMovies}}" wx:key="id">
+          <view class="dot {{currentMovieIndex === index ? 'active' : ''}}"></view>
+        </block>
+      </view>
+
+      <!-- 显示"生成推荐"按钮，仅当用户已评价所有电影且是最后一部电影时 -->
+      <block wx:if="{{showGenerateButton}}">
+        <button class="generate-btn" bindtap="onGenerateRecommendations">生成推荐</button>
+      </block>
+    </view>
+  </block>
+
+  <!-- 步骤3: 显示推荐结果 -->
+  <block wx:elif="{{step === 'result'}}">
+    <view class="header">
+      <text class="title">为您推荐的电影</text>
+      <text class="subtitle">根据您的喜好，我们精选了以下电影</text>
+    </view>
+
+    <view class="recommendation-list">
+      <block wx:for="{{recommendations}}" wx:key="movie_id">
+        <view class="recommendation-item" bindtap="navigateToDetail" data-id="{{item.movie_id}}">
+          <view class="recommendation-header">
+            <text class="recommendation-title">{{item.movie_name}}</text>
+            <view class="rating-container">
+              <text class="ai-rating">AI评分: {{item.ai_rating}}</text>
+              <text class="douban-rating">豆瓣: {{item.douban_rating}}</text>
+            </view>
+          </view>
+          
+          <view class="recommendation-score">
+            <view class="score-header">
+              <text class="score-text">推荐指数</text>
+              <text class="score-value">{{item.recommendation_score}}<text class="score-max">/10</text></text>
+            </view>
+            <view class="score-bar-container">
+              <view class="score-bar" style="width: {{item.recommendation_score * 10}}%"></view>
+            </view>
+          </view>
+          
+          <view class="recommendation-reasons">
+            <view class="reason good">
+              <text class="reason-label">推荐理由:</text>
+              <text class="reason-text">{{item.reason_good}}</text>
+            </view>
+            <view class="reason bad">
+              <text class="reason-label">注意事项:</text>
+              <text class="reason-text">{{item.reason_bad}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <button class="restart-btn" bindtap="onRestart">重新推荐</button>
+  </block>
+</view> 

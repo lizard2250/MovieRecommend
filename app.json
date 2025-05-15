@@ -5,6 +5,7 @@
     "pages/user/user",
     "pages/search/search",
     "pages/category/category",
+    "pages/ai-recommend/index",
     "pages/logs/logs"
   ],
   "window": {
@@ -28,6 +29,12 @@
         "text": "分类",
         "iconPath": "images/category.png",
         "selectedIconPath": "images/category_selected.png"
+      },
+      {
+        "pagePath": "pages/ai-recommend/index",
+        "text": "推荐",
+        "iconPath": "images/ai.png",
+        "selectedIconPath": "images/ai_selected.png"
       },
       {
         "pagePath": "pages/search/search",
